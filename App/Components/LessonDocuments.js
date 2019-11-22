@@ -14,6 +14,10 @@ import { FontAwesome } from '@expo/vector-icons';
 import Header from '../Components/Header';
 import * as ImagePicker from 'expo-image-picker';
 import * as Permissions from 'expo-permissions';
+import firebase from 'firebase';
+import firestore from '../../firebase'
+
+const rootStore = firebase.storage().ref();
 
 export default class LessonDocuments extends Component {
 
@@ -34,15 +38,38 @@ export default class LessonDocuments extends Component {
   	}
 
   	uploadImage = async(uri) => {
-	    const name = await AsyncStorage.getItem('name');
+  		const user = await firebase.auth().currentUser;
+  		const userEmail = user.email;
+  		console.log(userEmail)
 	    const response = await fetch(uri);
 	    const blob = await response.blob();
+	    console.log(blob)
 	    let splitURI = uri.split('/');
 	    let filename = splitURI[splitURI.length - 1];
-	    var ref = firebase.storage().ref().child(name+'/'+filename);
+	 //    var pictureRef = rootStore.child(filename);
+	 //    var pictureImagesRef = rootStore.child('images/'+filename)
+	 //    pictureImagesRef.put(blob).then(function(snapshot) {
+		// 	console.log('Uploaded a blob or file!');
+		// });
+	    // can this just be simplified to blob.name??
+	    var ref = firebase.storage().ref().child(userEmail+'/'+filename);
+	    //console.log(ref)
 	    let task = ref.put(blob);
+	    console.log('put blob and returning')
 	    return {task, ref};
+	    // return 1;
   	};
+
+  // 	testUpload = () => {
+  // 		var pictureRef = rootStore.child('fake');
+	 //    var pictureImagesRef = rootStore.child('test/'+'fake')
+	 //    var blob = {
+	 //    	eat: 'my ass',
+	 //    };
+	 //    pictureImagesRef.put(blob).then(function(snapshot) {
+		// 	console.log('Uploaded a blob or file!');
+		// });
+  // 	}
 
   	uploadFromCamera = async () => {
 	    await this.getPermissionAsync(Permissions.CAMERA);
@@ -146,11 +173,10 @@ const styles = StyleSheet.create({
 	},
 	title: {
 		width: '80%',
-		height: '10%',
 		marginTop: '10%',
 		fontSize: 25,
 		marginTop: 50,
-		marginBottom: 30,
+		marginBottom: 10,
 		textAlign: 'center',	
 	},
 	mediaIcons: {
@@ -158,6 +184,7 @@ const styles = StyleSheet.create({
 		height: '45%',
 		padding: 10, 
 	  	flexDirection: 'row',
+	  	marginBottom: 12,
 		justifyContent: 'space-around',
 	},
 	iconRow: {

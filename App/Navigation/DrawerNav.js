@@ -30,7 +30,7 @@ const DrawerNav = createDrawerNavigator(
     },
   }, 
   {
-    initialRouteName: 'Home',
+    initialRouteName: 'Create',
     contentComponent: CustomDrawer,
   }
 );

@@ -37,9 +37,9 @@ export default class LessonReview extends Component {
   	}
 
 	saveLessonName = () => {
-		if (this.state.lessonName.length <= 2) {
+		if (this.state.lessonName.length <= 0) {
 			this.setState({
-				errorMessage: 'Please input a name with at least 3 characters',
+				errorMessage: 'Please do not leave your lesson name blank',
 				error: true,
 			})
 		} else {

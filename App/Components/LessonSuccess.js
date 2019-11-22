@@ -28,7 +28,7 @@ export default class LessonSuccess extends Component {
 	render() {
 		return (
 			<View style={styles.container} >
-      			<Text style={styles.title} > <Text style={{fontWeight: 'bold'}}>Congradulations!</Text> You successfully created an awesome lesson! </Text>
+      			<Text style={styles.title} > <Text style={{fontWeight: 'bold'}}>Congratulations!</Text> You successfully created an awesome lesson! </Text>
       			<TouchableOpacity onPress={() => this.backToHomePage()} >
       				<FontAwesome name={'check-circle'} size={ 100 } color='purple' /> 
       			</TouchableOpacity>
