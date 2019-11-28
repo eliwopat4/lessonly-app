@@ -5,15 +5,15 @@ import {
 	Text,
 	TextInput,
 	TouchableOpacity,
+	TouchableHighlight,
 	Image,
 	Button,
 	View,
 } from 'react-native';
-import { Metrics, Colors, Images } from '../Themes';
+import { Metrics, Colors, Images } from '../../Themes';
 import { FontAwesome } from '@expo/vector-icons';
-import Header from '../Components/Header';
 
-export default class LessonMaterials extends Component {
+export default class LessonObjectives extends Component {
 
 	constructor(props) {
 	    super(props);
@@ -24,43 +24,39 @@ export default class LessonMaterials extends Component {
   	}
 
   	componentWillMount() {
-  		this.setState({ text: this.props.materials })
+  		this.setState({ text: this.props.objective })
   	}
 
+
   	updateText = (txt) => {
-  		this.props.handleAction('materials', txt, 'LessonMaterials');
+  		this.props.handleAction('objective', txt, 'LessonObjectives');
   		this.setState({ text: txt });
   	}
 
-  	rightArrowClicked = () => {
-  		this.props.handleAction('materials', this.state.text, 'LessonInstructions');
+  	clickedArrow = () => {
+  		this.props.handleAction('objective', this.state.text, 'LessonMaterials');
   	}
-
-  	leftArrowClicked = () => {
-  		this.props.handleAction('materials', this.state.text, 'LessonObjectives');
-  	}
-
 
 	render() {
 		return (
 			<View style={styles.container} >
-      			<Text style={styles.title} > What <Text style={{fontWeight: 'bold'}}>materials</Text> do you need for this lesson? </Text>
+      			<Text style={styles.title} > What are the lesson <Text style={{fontWeight: 'bold'}}>objectives</Text>? </Text>
       			<TextInput
           			style={styles.input}
 			      	onChangeText={txt => this.updateText(txt)}
 			      	value={this.state.text}
-			      	placeholder={'Enter materials here'}
+			      	placeholder={'Enter objective here'}
 			      	multiline={true}
 			      	keyboardShouldPersistTaps='handled'
     			/>
     			<View style={styles.arrowContainer} >
     				<View style={styles.leftArrow} >
-	    				<TouchableOpacity onPress={() => this.leftArrowClicked()} >
-	    					<FontAwesome name={'arrow-left'} size={ 50 } style={{color: 'black'}} /> 
+	    				<TouchableOpacity> 
+	    					<FontAwesome name={'arrow-left'} size={ 50 } style={{color: 'white'}} /> 
 	    				</TouchableOpacity>
     				</View>
     				<View style={styles.rightArrow} >
-	    				<TouchableOpacity onPress={() => this.rightArrowClicked()}>
+	    				<TouchableOpacity onPress={() => this.clickedArrow() }>
 	    					<FontAwesome name={'arrow-right'} size={ 50 } style={{color: 'black'}} /> 
 	    				</TouchableOpacity>
     				</View>

@@ -8,10 +8,10 @@ import {
 	Image,
 	Button,
 	View,
+	ScrollView,
 } from 'react-native';
-import { Metrics, Colors, Images } from '../Themes';
+import { Metrics, Colors, Images } from '../../Themes';
 import { FontAwesome } from '@expo/vector-icons';
-import Header from '../Components/Header';
 import Modal from 'react-native-modal';
 
 export default class LessonReview extends Component {
@@ -29,11 +29,11 @@ export default class LessonReview extends Component {
 
 
   	leftArrowClicked = () => {
-  		this.props.handleAction('lessonName', this.state.text, 'LessonDocuments');
+  		this.props.handleAction('lessonName', this.state.text, 'LessonMedia');
   	}
 
   	rightArrowClicked = () => {
-  		this.props.handleAction('lessonName', this.state.text, 'LessonConfirmation');
+  		this.props.handleAction('lessonName', this.state.text, 'LessonShare');
   	}
 
 	saveLessonName = () => {
@@ -45,7 +45,7 @@ export default class LessonReview extends Component {
 		} else {
 			this.setState({ isModalVisible: false });
 			setTimeout(() => {
-				this.props.handleAction('lessonName', this.state.lessonName, 'LessonConfirmation')
+				this.props.handleAction('lessonName', this.state.lessonName, 'LessonShare')
 			}, 1550);
 		}
 	}
@@ -63,6 +63,61 @@ export default class LessonReview extends Component {
     	} else {
     		this.setState({ isModalVisible: true });
     	}
+	}
+
+	testMethod = () => {
+		this.props.handleAction('media', 'none', 'LessonReview')
+	}
+
+	getDocIcon = () => {
+		console.log(this.props.media)
+		switch(this.props.media) {
+		  	case 'none':
+		  		return (<Text style={{marginBottom: 20}}> None </Text>);
+		    	break;
+		    case 'image':
+		    	return (
+		    		<View> 
+			    		<FontAwesome name={'image'} size={ 75 } style={{color: 'black'}} />
+			    		<TouchableOpacity onPress={() => this.testMethod()} >
+			    			<Text style={{fontWeight:'bold', fontSize:15, color:'red', textAlign:'center'}}> Remove </Text>
+			    		</TouchableOpacity>
+		    		</View>
+		    	);
+		    	break; 
+		    case 'video':
+		    	return (
+		    		<View>
+			    		<FontAwesome name={'play-circle'} size={ 75 } style={{color: 'black'}} />
+			    		<TouchableOpacity onPress={() => this.testMethod()} >
+			    			<Text style={{fontWeight:'bold', fontSize:15, color:'red', textAlign:'center'}}> Remove </Text>
+			    		</TouchableOpacity>
+		    		</View>
+		    	);
+		    	break; 
+		    case 'music':
+		    	return (
+		    		<View>
+			    		<FontAwesome name={'music'} size={ 75 } style={{color: 'black'}} />
+			    		<TouchableOpacity onPress={() => this.testMethod()} >
+			    			<Text style={{fontWeight:'bold', fontSize:15, color:'red', textAlign:'center'}}> Remove </Text>
+			    		</TouchableOpacity>
+		    		</View>
+		    		);
+		    	break; 
+		    case 'document':
+		    	return (
+		    		<View>
+			    		<FontAwesome name={'paperclip'} size={ 75 } style={{color: 'black'}} />
+			    		<TouchableOpacity onPress={() => this.testMethod()} >
+			    			<Text style={{fontWeight:'bold', fontSize:15, color:'red', textAlign:'center'}}> Remove </Text>
+			    		</TouchableOpacity>
+		    		</View>
+		    		);
+		    	break; 
+		  	default:
+		    	return (<Text style={{marginBottom: 20}}> Error </Text>);
+		}
 	}
 
 	render() {
@@ -99,18 +154,20 @@ export default class LessonReview extends Component {
 		        </Modal>
 
       			<Text style={styles.title} > Here's your lesson plan... </Text>
-      			<View style={styles.input}> 
-      				<Text style={{fontWeight: 'bold'}}> Objective </Text>
-      				<Text style={{marginBottom: 20}}> {this.props.objective} </Text>
-      				
-      				<Text style={{fontWeight: 'bold'}}> Materials </Text>
-      				<Text style={{marginBottom: 20}}> {this.props.materials} </Text>
-      				
-      				<Text style={{fontWeight: 'bold'}}> Instructions </Text>
-      				<Text style={{marginBottom: 20}}> {this.props.instructions} </Text>
-      				
-      				<Text style={{fontWeight: 'bold'}}> Documents </Text>
-      				<Text style={{marginBottom: 20}}> {this.props.documents} </Text>
+      			<View style={styles.scrollview}>
+	      			<ScrollView > 
+	      				<Text style={{fontWeight: 'bold'}}> Objective </Text>
+	      				<Text style={{marginBottom: 20}}> {this.props.objective} </Text>
+	      				
+	      				<Text style={{fontWeight: 'bold'}}> Materials </Text>
+	      				<Text style={{marginBottom: 20}}> {this.props.materials} </Text>
+	      				
+	      				<Text style={{fontWeight: 'bold'}}> Instructions </Text>
+	      				<Text style={{marginBottom: 20}}> {this.props.instructions} </Text>
+	      				
+	      				<Text style={{fontWeight: 'bold'}}> Media </Text>
+						{this.getDocIcon()}
+	      			</ScrollView>
       			</View>
 				<TouchableOpacity style={styles.button} onPress={() => this.toggleModal() } >
 		         	<Text style={{fontSize:20}}> Create </Text>
@@ -146,7 +203,7 @@ const styles = StyleSheet.create({
 		marginTop: 50,
 		textAlign: 'center',	
 	},
-	input: {
+	scrollview: {
 		width: '80%', 
 		height: '45%',
 		padding: 10, 

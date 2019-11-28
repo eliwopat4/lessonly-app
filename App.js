@@ -20,7 +20,7 @@ const SwitchNav = createSwitchNavigator(
     },
   },
   {
-    initialRouteName: 'AuthNav',
+    initialRouteName: 'MainApp',
   }
 );
 

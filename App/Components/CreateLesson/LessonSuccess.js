@@ -9,9 +9,8 @@ import {
 	Button,
 	View,
 } from 'react-native';
-import { Metrics, Colors, Images } from '../Themes';
+import { Metrics, Colors, Images } from '../../Themes';
 import { FontAwesome } from '@expo/vector-icons';
-import Header from '../Components/Header';
 
 export default class LessonSuccess extends Component {
 

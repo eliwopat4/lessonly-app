@@ -9,23 +9,22 @@ import {
 	Button,
 	View,
 } from 'react-native';
-import { Metrics, Colors, Images } from '../Themes';
+import { Metrics, Colors, Images } from '../../Themes';
 import { FontAwesome } from '@expo/vector-icons';
-import Header from '../Components/Header';
 import * as ImagePicker from 'expo-image-picker';
 import * as Permissions from 'expo-permissions';
 import firebase from 'firebase';
-import firestore from '../../firebase'
+import firestore from '../../../firebase'
 
 const rootStore = firebase.storage().ref();
 
-export default class LessonDocuments extends Component {
+export default class LessonMedia extends Component {
 
 	constructor(props) {
 	    super(props);
 
 	    this.state = {
-	    	text: '',
+	    	text: 'none',
 	  	}
   	}
 
@@ -103,51 +102,55 @@ export default class LessonDocuments extends Component {
 	    }
   	}
 
-  	updateText = (txt) => {
-  		this.props.handleAction('documents', txt, 'LessonDocuments');
-  		this.setState({ text: txt });
-  	}
-
   	rightArrowClicked = () => {
-  		this.props.handleAction('documents', this.state.text, 'LessonReview');
+  		this.props.handleAction('media', this.state.text, 'LessonReview');
   	}
 
   	leftArrowClicked = () => {
-  		this.props.handleAction('documents', this.state.text, 'LessonInstructions');
+  		this.props.handleAction('media', this.state.text, 'LessonInstructions');
   	}
 
-  	uploadDocument = () => {
-  		alert('Functionality to be finished later or hardcoded in')
+  	uploadDocument = (txt) => {
+  		this.setState({ text: txt })
+  		this.props.handleAction('media', this.state.text, 'LessonMedia');
   	}
 
+  	noDoc = (txt) => {
+  		this.setState({ text: txt });
+  		setTimeout(() => {
+  			this.props.handleAction('media', this.state.text, 'LessonReview');
+  		}, 200);
+  	}
 
 	render() {
 		return (
 			<View style={styles.container} >
       			<Text style={styles.title} > 
-      				Do you have any <Text style={{fontWeight: 'bold'}}>videos</Text>, 
-      				<Text style={{fontWeight: 'bold'}}> songs</Text>, or 
-      				<Text style={{fontWeight: 'bold'}}> documents</Text> essential
-      				 to this lesson? 
+      				What
+      				<Text style={{fontWeight: 'bold'}}> media content </Text>
+      				is necessary for this lesson?
       			</Text>
     			<View style={styles.mediaIcons}>
     				<View style={styles.iconRow}>
-		    			<TouchableOpacity style={styles.icon} onPress={() => this.uploadDocument()}> 
+		    			<TouchableOpacity style={styles.icon} onPress={() => this.uploadDocument('document')}> 
 							<FontAwesome name={'paperclip'} size={ 100 } style={{color: 'black'}} /> 
 						</TouchableOpacity>
-						<TouchableOpacity style={styles.icon} onPress={() => this.uploadFromLibrary()}> 
+						<TouchableOpacity style={styles.icon} onPress={() => this.uploadDocument('image')}> 
 							<FontAwesome name={'image'} size={ 100 } style={{color: 'black'}} /> 
 						</TouchableOpacity>
 					</View>
 					<View style={styles.iconRow}>
-						<TouchableOpacity style={styles.icon} onPress={() => this.uploadDocument()}> 
+						<TouchableOpacity style={styles.icon} onPress={() => this.uploadDocument('video')}> 
 							<FontAwesome name={'play-circle'} size={ 100 } style={{color: 'black'}} /> 
 						</TouchableOpacity>
-						<TouchableOpacity style={styles.icon} onPress={() => this.uploadDocument()}> 
+						<TouchableOpacity style={styles.icon} onPress={() => this.uploadDocument('music')}> 
 							<FontAwesome name={'music'} size={ 100 } style={{color: 'black'}} /> 
 						</TouchableOpacity>
 					</View>
 				</View>
+				<TouchableOpacity style={styles.button} onPress={() => this.noDoc('none')} >
+					<Text style={{textAlign:'center', fontSize: 15, color: 'black'}}> None </Text>
+				</TouchableOpacity>
     			<View style={styles.arrowContainer} >
     				<View style={styles.leftArrow} >
 	    				<TouchableOpacity onPress={() => this.leftArrowClicked()} >
@@ -185,6 +188,7 @@ const styles = StyleSheet.create({
 		padding: 10, 
 	  	flexDirection: 'row',
 	  	marginBottom: 12,
+	  	marginTop: 30,
 		justifyContent: 'space-around',
 	},
 	iconRow: {
@@ -206,11 +210,24 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 	},
 	leftArrow: {
-		marginTop: 70,
+		marginTop: 30,
 		marginRight: '25%',
 	},
 	rightArrow: {
-		marginTop: 70,
+		marginTop: 30,
 		marginLeft: '25%',
+	},button: {
+	    shadowColor: 'gray', 
+	    shadowOffset: { height: 3, width: 3 }, 
+	    shadowOpacity: 3, 
+	    shadowRadius: 3, 
+	  	borderWidth: 1,
+	  	backgroundColor: 'white',
+	    height: 40,
+	    width: 180,
+	    borderRadius: 50,
+	    justifyContent: 'center',
+	    alignItems: 'center',
+	    flexDirection: 'row',
 	},
 })

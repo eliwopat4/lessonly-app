@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-around'
 	}, 
 	box1: {
-		borderWidth: 1,
+		borderWidth: 3,
 		alignItems: 'center',
 		justifyContent: 'center',
 		height: 170,
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
 		backgroundColor: 'royalblue',
 	},
 	box2: {
-		borderWidth: 1,
+		borderWidth: 3,
 		alignItems: 'center',
 		justifyContent: 'center',
 		height: 170,
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
 		backgroundColor: 'fuchsia',
 	},
 	box3: {
-		borderWidth: 1,
+		borderWidth: 3,
 		alignItems: 'center',
 		justifyContent: 'center',
 		height: 250,
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
 		backgroundColor: 'darkviolet',
 	},
 	box4: {
-		borderWidth: 1,
+		borderWidth: 3,
 		alignItems: 'center',
 		justifyContent: 'center',
 		height: 100,

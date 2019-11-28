@@ -9,11 +9,10 @@ import {
 	Button,
 	View,
 } from 'react-native';
-import { Metrics, Colors, Images } from '../Themes';
+import { Metrics, Colors, Images } from '../../Themes';
 import { FontAwesome } from '@expo/vector-icons';
-import Header from '../Components/Header';
 
-export default class LessonInstructions extends Component {
+export default class LessonMaterials extends Component {
 
 	constructor(props) {
 	    super(props);
@@ -24,33 +23,34 @@ export default class LessonInstructions extends Component {
   	}
 
   	componentWillMount() {
-  		this.setState({ text: this.props.instructions })
+  		this.setState({ text: this.props.materials })
   	}
 
   	updateText = (txt) => {
-  		this.props.handleAction('instructions', txt, 'LessonInstructions');
+  		this.props.handleAction('materials', txt, 'LessonMaterials');
   		this.setState({ text: txt });
   	}
 
   	rightArrowClicked = () => {
-  		this.props.handleAction('instructions', this.state.text, 'LessonDocuments');
+  		this.props.handleAction('materials', this.state.text, 'LessonInstructions');
   	}
 
   	leftArrowClicked = () => {
-  		this.props.handleAction('instructions', this.state.text, 'LessonMaterials');
+  		this.props.handleAction('materials', this.state.text, 'LessonObjectives');
   	}
 
 
 	render() {
 		return (
 			<View style={styles.container} >
-      			<Text style={styles.title} > What <Text style={{fontWeight: 'bold'}}>instructions</Text> would give for this lesson? </Text>
+      			<Text style={styles.title} > What <Text style={{fontWeight: 'bold'}}>materials</Text> do you need for this lesson? </Text>
       			<TextInput
           			style={styles.input}
 			      	onChangeText={txt => this.updateText(txt)}
 			      	value={this.state.text}
-			      	placeholder={'Enter instructions here'}
+			      	placeholder={'Enter materials here'}
 			      	multiline={true}
+			      	keyboardShouldPersistTaps='handled'
     			/>
     			<View style={styles.arrowContainer} >
     				<View style={styles.leftArrow} >

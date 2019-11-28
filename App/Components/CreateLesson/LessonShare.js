@@ -10,12 +10,12 @@ import {
 	Button,
 	View,
 } from 'react-native';
-import { Metrics, Colors, Images } from '../Themes';
+import { Metrics, Colors, Images } from '../../Themes';
 import { FontAwesome } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 
 
-export default class LessonConfirmation extends Component {
+export default class LessonShare extends Component {
 
 	constructor(props) {
 	    super(props);
@@ -38,7 +38,7 @@ export default class LessonConfirmation extends Component {
   	}
 
   	updateText = (txt) => {
-  		this.props.handleAction('confirmation', txt, 'LessonConfirmation');
+  		this.props.handleAction('confirmation', txt, 'LessonShare');
   		this.setState({ text: txt });
   	}
 

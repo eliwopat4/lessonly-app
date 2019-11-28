@@ -11,13 +11,13 @@ import {
 } from 'react-native';
 import { Metrics, Colors, Images } from '../Themes';
 import Header from '../Components/Header';
-import LessonObjectives from '../Components/LessonObjectives';
-import LessonMaterials from '../Components/LessonMaterials';
-import LessonInstructions from '../Components/LessonInstructions';
-import LessonDocuments from '../Components/LessonDocuments';
-import LessonReview from '../Components/LessonReview';
-import LessonConfirmation from '../Components/LessonConfirmation';
-import LessonSuccess from '../Components/LessonSuccess';
+import LessonObjectives from '../Components/CreateLesson/LessonObjectives';
+import LessonMaterials from '../Components/CreateLesson/LessonMaterials';
+import LessonInstructions from '../Components/CreateLesson/LessonInstructions';
+import LessonMedia from '../Components/CreateLesson/LessonMedia';
+import LessonReview from '../Components/CreateLesson/LessonReview';
+import LessonShare from '../Components/CreateLesson/LessonShare';
+import LessonSuccess from '../Components/CreateLesson/LessonSuccess';
 
 export default class CreateScreen extends React.Component {
 
@@ -28,7 +28,7 @@ export default class CreateScreen extends React.Component {
 	    	objective: '',
 	    	materials: '',
 	    	instructions: '',
-	    	documents: '',
+	    	media: '',
 	    	lessonName: '',
 	    	confirmation: '',
 	    	currComponent: 'LessonObjectives',
@@ -50,7 +50,7 @@ export default class CreateScreen extends React.Component {
   				objective: '',
 		    	materials: '',
 		    	instructions: '',
-		    	documents: '',
+		    	media: '',
 		    	lessonName: '',
 		    	confirmation: '',
 		    	currComponent: 'LessonObjectives',
@@ -77,14 +77,14 @@ export default class CreateScreen extends React.Component {
 		    case 'LessonInstructions':
 		   		return (<LessonInstructions {...this.state} handleAction = {this.handleAction} />);
 		    	break;
-		    case 'LessonDocuments':
-		   		return (<LessonDocuments {...this.state} handleAction = {this.handleAction} />);
+		    case 'LessonMedia':
+		   		return (<LessonMedia {...this.state} handleAction = {this.handleAction} />);
 		    	break;
 		    case 'LessonReview':
 		   		return (<LessonReview {...this.state} handleAction = {this.handleAction} />);
 		    	break;
-		    case 'LessonConfirmation':
-		   		return (<LessonConfirmation {...this.state} handleAction = {this.handleAction} />);
+		    case 'LessonShare':
+		   		return (<LessonShare {...this.state} handleAction = {this.handleAction} />);
 		    	break;
 		    case 'LessonSuccess':
 		   		return (<LessonSuccess {...this.state} handleAction = {this.handleAction} navigate={this.props.navigation.navigate}/>);
