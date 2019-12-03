@@ -3,15 +3,27 @@ import {
 	StyleSheet,
 	SafeAreaView,
 	Text,
-	TouchableOpacity,
 	Image,
-	Platform,
 	View,
+	TextInput,
+	TouchableOpacity,
+	Platform,
+	FlatList,
 	Button,
+	TouchableWithoutFeedback,
+	Keyboard,
 } from 'react-native';
 import { Metrics, Colors, Images } from '../Themes';
 import { SearchBar } from 'react-native-elements'
 import Header from '../Components/Header';
+import DefaultSearch from '../Components/DefaultSearch';
+import SearchLessons from '../Components/SearchLessons';
+import LessonOverview from '../Components/LessonOverview';
+import Calendar from '../Components/Calendar';
+import firebase from 'firebase';
+import firestore from '../../firebase'
+
+const usersRef = firestore.collection('lessons');
 
 export default class HomeScreen extends React.Component {
 
@@ -20,78 +32,82 @@ export default class HomeScreen extends React.Component {
 
 	    this.state = {
 	    	search: '',
+	    	lessons: [],
+	    	data: [],
+	    	currComponent: 'DefaultSearch',
+	    	lesson: ''
 	  	}
   	}
 
-	menuAction = (action) => {
-  		if (action.localeCompare('OpenDrawer') === 0) {
-  			this.props.navigation.toggleDrawer();
+	handleAction = (state, newState, component) => {
+		// console.log('stateChange: '+state+' to '+newState)
+		// console.log('update component to: '+component)
+		if(state.localeCompare('currComponent') === 0) {
+			this.setState({ [state]: newState });
+		} else if (state.localeCompare('cleanUp') === 0) {
+  			this.setState({
+  				search: '',
+		    	lessons: [],
+		    	currComponent: 'DefaultSearch',
+		    	lesson: '',
+  			})
+  		} else if (component.localeCompare(this.state.currComponent) === 0) {
+  			console.log('updating '+state+'...');
+  			this.setState({ [state]: newState });
   		} else {
-  			this.props.navigation.navigate(action)
+  			this.setState({ 
+  				[state]: newState,
+  				currComponent: component
+  			});
   		}
   	}
 
-  	updateSearch = (txt) => {
-  		this.setState({ search: txt });
+  	getComponent() {
+  		switch(this.state.currComponent) {
+		  	case 'DefaultSearch':
+		  		return (<DefaultSearch {...this.state} handleAction = {this.handleAction} />);
+		    	break;
+		  	case 'SearchLessons':
+		  		return (<SearchLessons {...this.state} handleAction = {this.handleAction} />);
+		    	break;
+		    case 'LessonOverview':
+		  		return (<LessonOverview {...this.state} handleAction = {this.handleAction} navigate = {this.props.navigation.navigate}/>);
+		    	break;
+		     case 'Calendar':
+		  		return (<Calendar {...this.state} handleAction = {this.handleAction} navigate = {this.props.navigation.navigate}/>);
+		    	break;
+		}
   	}
 
-  	printMethod = () => {
-  		console.log(this.props.navigation.state);
+  	printStates = () => {
+  		console.log(this.state.search);
+  		// console.log(this.state.lessons);
+  		// console.log(this.state.data);
+  		console.log(this.state.currComponent);
   	}
-	componentDidMount() {
-  		var screen = this.props.navigation.getParam('screenA', 'null');
-  		this.props.navigation.setParams({ 
-  			screenA: this.props.navigation.state.routeName,
-  			screenB: screen,
-  		});
+
+  	navigate = (screen) => {
+  		this.props.screenProps = 'LessonObjectives';
+  		this.props.navigation.navigate(screen)
   	}
 
 	render() {
 		return (
+
 			<SafeAreaView style={styles.container}>
-				<Header navigate = {this.menuAction} />
-      			<Text style={styles.title} > Lessonly </Text>
-      			<SearchBar
-					round
-					containerStyle={styles.input}
-					platform={(Platform.OS === 'ios') ? "ios" : "android"}
-					searchIcon={
-						{ size: Metrics.small },
-						{ color: 'red' }
-					}
-					value={this.state.search}
-		            onChangeText={text => this.updateSearch(text)} 
-					placeholder='Find a lesson'
-		            autoCapitalize = 'none'
-				/>
-				<View style={styles.boxContainer}>
-					<View style={styles.column1} >
-						<TouchableOpacity style={styles.box1}>
-							<Text style={styles.boxText}> Top Picks for you </Text>
-						</TouchableOpacity>
-						<TouchableOpacity style={styles.box2}>
-							<Text style={styles.boxText} > Your Favorites </Text>
-						</TouchableOpacity>
-					</View>
-					<View style={styles.column2} >
-						<TouchableOpacity style={styles.box3}>
-							<Text style={styles.boxText} > Trending in AP Mathematics </Text>
-						</TouchableOpacity>
-						<TouchableOpacity style={styles.box4}>
-							<Text style={styles.boxText} > Top Decimal Lessons </Text>
-						</TouchableOpacity>
-					</View>
-				</View>
-				
+				<Header openDrawer = {this.props.navigation.toggleDrawer} navigate = {this.navigate}/>
+				{this.getComponent()}
 			</SafeAreaView>
-			
 		);
 	}
 }
 
+
+
 const styles = StyleSheet.create({
 	container: {
-		flex: 1,
+		height: '100%',
+		width: '100%',
 		backgroundColor: 'white',
 		alignItems: 'center',	
 	},
@@ -158,5 +174,9 @@ const styles = StyleSheet.create({
 		fontWeight: 'bold',
 		color: 'white',
 		padding: 10,
-	}
+	},
+
 })
+
+
+

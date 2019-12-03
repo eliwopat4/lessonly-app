@@ -8,6 +8,8 @@ import {
 	Image,
 	View,
 	TextInput,
+	Keyboard,
+	TouchableWithoutFeedback,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import firebase from 'firebase';
@@ -120,42 +122,46 @@ export default class LoginScreen extends React.Component {
 	render() {
 		return (
 			<LinearGradient colors={[Colors.lg1, Colors.lg2, Colors.lg3]} style={styles.container}>
-				<Modal
-			      	isVisible={this.state.isModalVisible}
-			      	animationInTiming={1500}
-			      	animationOutTiming={1500}
-			      	backdropTransitionInTiming={1500}
-			      	backdropTransitionOutTiming={1500}
-			    >
-			    	<LinearGradient colors={[Colors.lg1, Colors.lg2, Colors.lg3]} style={styles.modalContent}>
-				    		<Text style={styles.modalText}> {this.state.modalMessage} </Text>
-				  	 		<TouchableOpacity style={styles.modalButton} onPress={() => this.toggleModal()}>
-					     		<Text> Close </Text> 
-					     	</TouchableOpacity>
-			    	</LinearGradient>
-			    </Modal>
-      			<Image source={Images.LessonlyWhiteBulb} style={styles.lessonlyBulb} /> 
-				<Text style={styles.loginLabel}> Login </Text>
-				<TextInput
-		            style={styles.input}
-		            onChangeText={(txt) => this.updateEmail(txt)} 
-		            placeholder={'Email'}
-		            autoCapitalize = 'none'
-		    	/>
-		        <TextInput
-		            style={styles.input}
-		            onChangeText={(txt) => this.updatePassword(txt)} 
-		            placeholder={'Password'}
-		            secureTextEntry={true}
-		            autoCapitalize = 'none'
-		        />
-		        <TouchableOpacity style={styles.button} onPress={() => this.loginAttempt(this.state.email, this.state.password) } >
-		         	<Text> Login </Text>
-		       	</TouchableOpacity>
-		       	<TouchableOpacity style={styles.button} onPress={() => this.props.navigation.navigate('Signup') } >
-		         	<Text> Sign Up </Text>
-		       	</TouchableOpacity>
-		  	</LinearGradient>	
+				<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()} style={styles.container}>
+					<View style={styles.container}>
+						<Modal
+					      	isVisible={this.state.isModalVisible}
+					      	animationInTiming={1500}
+					      	animationOutTiming={1500}
+					      	backdropTransitionInTiming={1500}
+					      	backdropTransitionOutTiming={1500}
+					    >
+					    	<LinearGradient colors={[Colors.lg1, Colors.lg2, Colors.lg3]} style={styles.modalContent}>
+						    		<Text style={styles.modalText}> {this.state.modalMessage} </Text>
+						  	 		<TouchableOpacity style={styles.modalButton} onPress={() => this.toggleModal()}>
+							     		<Text> Close </Text> 
+							     	</TouchableOpacity>
+					    	</LinearGradient>
+					    </Modal>
+			  			<Image source={Images.LessonlyWhiteBulb} style={styles.lessonlyBulb} /> 
+						<Text style={styles.loginLabel}> Login </Text>
+						<TextInput
+				            style={styles.input}
+				            onChangeText={(txt) => this.updateEmail(txt)} 
+				            placeholder={'Email'}
+				            autoCapitalize = 'none'
+				    	/>
+				        <TextInput
+				            style={styles.input}
+				            onChangeText={(txt) => this.updatePassword(txt)} 
+				            placeholder={'Password'}
+				            secureTextEntry={true}
+				            autoCapitalize = 'none'
+				        />
+				        <TouchableOpacity style={styles.button} onPress={() => this.loginAttempt(this.state.email, this.state.password) } >
+				         	<Text> Login </Text>
+				       	</TouchableOpacity>
+				       	<TouchableOpacity style={styles.button} onPress={() => this.props.navigation.navigate('Signup') } >
+				         	<Text> Sign Up </Text>
+				       	</TouchableOpacity>
+					</View>
+				</TouchableWithoutFeedback>
+			</LinearGradient>
 		)
 	}
 }
@@ -163,8 +169,10 @@ export default class LoginScreen extends React.Component {
 
 const styles = StyleSheet.create({
 	container: {
-		flex: 1,
+		height: '100%',
+		width: '100%',
 		alignItems: 'center',
+
 	},
 	input: {
 		shadowColor: 'gray', 

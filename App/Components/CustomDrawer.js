@@ -49,8 +49,8 @@ export default class CustomDrawer extends Component {
 	                <View style={[styles.screenStyle, (this.props.activeItemKey=='Create') ? styles.activeBackgroundColor : null]}>
 	                    <Text style={[styles.screenTextStyle, (this.props.activeItemKey=='Create') ? styles.selectedTextStyle : null]} onPress={this.navigateToScreen('Create')}>Create</Text>
 	                </View>
-	                <View style={[styles.screenStyle, (this.props.activeItemKey=='Search') ? styles.activeBackgroundColor : null]}>
-	                    <Text style={[styles.screenTextStyle, (this.props.activeItemKey=='Search') ? styles.selectedTextStyle : null]} onPress={this.navigateToScreen('Search')}>Search</Text>
+	                <View style={[styles.screenStyle, (this.props.activeItemKey=='Calendar') ? styles.activeBackgroundColor : null]}>
+	                    <Text style={[styles.screenTextStyle, (this.props.activeItemKey=='Calendar') ? styles.selectedTextStyle : null]} onPress={this.navigateToScreen('Calendar')}>Calendar</Text>
 	                </View>
 	            </View>
 	        </View>

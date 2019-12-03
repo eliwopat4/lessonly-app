@@ -10,15 +10,11 @@ import {
 import { Images, Metrics } from '../Themes';
 import { FontAwesome } from '@expo/vector-icons';
 
-
-
 export default class Header extends Component {
-
-
 	render() {
 		return (
 			<View style={styles.container}>
-				<TouchableOpacity style={styles.menu} onPress={() => this.props.navigate('OpenDrawer')} >
+				<TouchableOpacity style={styles.menu} onPress={() => this.props.openDrawer()} >
 	  				<FontAwesome name={'bars'} size={ 40 } style={{color: 'black'}} />
 	  			</TouchableOpacity>
 				<TouchableOpacity style={styles.bulb} onPress={() => this.props.navigate('Home')} >
@@ -33,7 +29,6 @@ export default class Header extends Component {
 const styles = StyleSheet.create({
 	container: {
 		width: '100%',
-		//height: '10%',
 		alignItems: 'center',	
 		flexDirection: 'row',
 	},

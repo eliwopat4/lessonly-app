@@ -8,147 +8,160 @@ import {
 	Image,
 	Button,
 	View,
+	ActivityIndicator
 } from 'react-native';
 import { Metrics, Colors, Images } from '../../Themes';
 import { FontAwesome } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import * as Permissions from 'expo-permissions';
+import Modal from 'react-native-modal';
 import firebase from 'firebase';
 import firestore from '../../../firebase'
 
 const rootStore = firebase.storage().ref();
-
+const collRef = firestore.collection('users');
+  
 export default class LessonMedia extends Component {
 
 	constructor(props) {
 	    super(props);
 
 	    this.state = {
-	    	text: 'none',
+	    	media: '',
+	    	loading: false,
+	    	isModalVisible: false,
 	  	}
   	}
 
+  	componentDidMount() {
+  		this.setState({media: this.props.media})
+  	}
 
   	getPermissionAsync = async (permission) => {
-		const { status } = await Permissions.askAsync(permission);
+		const { status } = await Permissions.askAsync(permission)
 		if (status !== 'granted') {
-		  alert('Sorry, we need camera roll or camera permissions to make this work!');
+		  alert('Sorry, we need camera roll or camera permissions to make this work!')
 		}
   	}
 
   	uploadImage = async(uri) => {
-  		const user = await firebase.auth().currentUser;
-  		const userEmail = user.email;
-  		console.log(userEmail)
+	    console.log('uploading image to storage...')
 	    const response = await fetch(uri);
 	    const blob = await response.blob();
-	    console.log(blob)
 	    let splitURI = uri.split('/');
 	    let filename = splitURI[splitURI.length - 1];
-	 //    var pictureRef = rootStore.child(filename);
-	 //    var pictureImagesRef = rootStore.child('images/'+filename)
-	 //    pictureImagesRef.put(blob).then(function(snapshot) {
-		// 	console.log('Uploaded a blob or file!');
-		// });
-	    // can this just be simplified to blob.name??
-	    var ref = firebase.storage().ref().child(userEmail+'/'+filename);
-	    //console.log(ref)
+	    var ref = rootStore.child(this.props.user+'/'+filename);
 	    let task = ref.put(blob);
-	    console.log('put blob and returning')
-	    return {task, ref};
-	    // return 1;
-  	};
-
-  // 	testUpload = () => {
-  // 		var pictureRef = rootStore.child('fake');
-	 //    var pictureImagesRef = rootStore.child('test/'+'fake')
-	 //    var blob = {
-	 //    	eat: 'my ass',
-	 //    };
-	 //    pictureImagesRef.put(blob).then(function(snapshot) {
-		// 	console.log('Uploaded a blob or file!');
-		// });
-  // 	}
-
-  	uploadFromCamera = async () => {
-	    await this.getPermissionAsync(Permissions.CAMERA);
-	    let result = await ImagePicker.launchCameraAsync();
-	    if (!result.cancelled) {
-	      //uri is the local name of the image on phone
-	      let res = await this.uploadImage(result.uri); 
-
-	      //To save where the image is, we can do 2 things.
-	      //1) just keep track of the url by putting it in the user data in firebase or locally
-	      //2) don't get the url until you need it. i.e., you know the user folder in storage, so why get url right now? Get it when you need it
-	      await res.task;
-	      let url = await res.ref.getDownloadURL();
-	      console.log(url);
-	    }
+	    return {task, ref, filename};
   	}
 
   	uploadFromLibrary = async () => {
 	    await this.getPermissionAsync(Permissions.CAMERA_ROLL);
 	    let result = await ImagePicker.launchImageLibraryAsync();
 	    if (!result.cancelled) {
-	      //uri is the local name of the image on phone
-	      let res = await this.uploadImage(result.uri); 
-
-	      //To save where the image is, we can do 2 things.
-	      //1) just keep track of the url by putting it in the user data in firebase or locally
-	      //2) don't get the url until you need it. i.e., you know the user folder in storage, so why get url right now? Get it when you need it
-	      await res.task;
-	      let url = await res.ref.getDownloadURL();
-	      console.log(url);
+  			this.setState({loading: true})
+	      	let res = await this.uploadImage(result.uri); 
+	      	await res.task;
+      		let url = await res.ref.getDownloadURL();
+	      	var mediaObject = {
+	      		type: 'image',
+	      		ref: url,
+	      		name: res.filename,
+	      	}
+  			this.setState({
+  				loading: false, 
+  				isModalVisible: true,
+  				media: mediaObject,
+  			})
 	    }
   	}
 
   	rightArrowClicked = () => {
-  		this.props.handleAction('media', this.state.text, 'LessonReview');
+  		this.props.handleAction('media', this.state.media, 'LessonReview');
   	}
 
   	leftArrowClicked = () => {
-  		this.props.handleAction('media', this.state.text, 'LessonInstructions');
+  		this.props.handleAction('media', this.state.media, 'LessonInstructions');
   	}
 
-  	uploadDocument = (txt) => {
-  		this.setState({ text: txt })
-  		this.props.handleAction('media', this.state.text, 'LessonMedia');
-  	}
-
-  	noDoc = (txt) => {
-  		this.setState({ text: txt });
+  	uploadMedia = (mediaType) => {
+  		var mediaObject = {
+  			type: mediaType,
+  			ref: '',
+  			name: '',
+  		}
+  		this.setState({ media: mediaObject })
   		setTimeout(() => {
-  			this.props.handleAction('media', this.state.text, 'LessonReview');
-  		}, 200);
+  			this.props.handleAction('media', this.state.media, 'LessonReview');
+  		}, 500);
+  	}
+
+  	noDoc = (mediaType) => {
+  		var mediaObject = {
+  			type: mediaType,
+  			ref: '',
+  			name: '',
+  		}
+  		this.setState({ media: mediaObject });
+  		setTimeout(() => {
+  			this.props.handleAction('media', this.state.media, 'LessonReview');
+  		}, 500);
+  	}
+
+  	closeModal = () => {
+  		this.setState({isModalVisible: false})
+  		this.props.handleAction('media', this.state.media, 'LessonReview');
   	}
 
 	render() {
 		return (
 			<View style={styles.container} >
+				<Modal
+		          isVisible={this.state.isModalVisible}
+		          animationInTiming={1500}
+		          animationOutTiming={1500}
+		          backdropTransitionInTiming={1500}
+		          backdropTransitionOutTiming={1500}
+		        >
+		        	<View style={styles.modalContent} >
+		        		<Text style={{fontSize: 20, textAlign: 'center', marginBottom: 20}}> Successfully uploaded!! </Text>
+		        		<TouchableOpacity style={styles.button} onPress={() => this.closeModal()} >
+							<Text style={{textAlign:'center', fontSize: 15, color: 'black'}}> Close </Text>
+						</TouchableOpacity>
+		        	</View>
+		        </Modal>
       			<Text style={styles.title} > 
       				What
       				<Text style={{fontWeight: 'bold'}}> media content </Text>
       				is necessary for this lesson?
       			</Text>
-    			<View style={styles.mediaIcons}>
-    				<View style={styles.iconRow}>
-		    			<TouchableOpacity style={styles.icon} onPress={() => this.uploadDocument('document')}> 
-							<FontAwesome name={'paperclip'} size={ 100 } style={{color: 'black'}} /> 
-						</TouchableOpacity>
-						<TouchableOpacity style={styles.icon} onPress={() => this.uploadDocument('image')}> 
-							<FontAwesome name={'image'} size={ 100 } style={{color: 'black'}} /> 
-						</TouchableOpacity>
+      			{
+      				this.state.loading ?
+      				<View style={styles.mediaIcons}>
+      					<ActivityIndicator size="large" color="#0000ff" />
+      				</View>
+      				 :
+      				<View style={styles.mediaIcons}>
+	    				<View style={styles.iconRow}>
+			    			<TouchableOpacity style={styles.icon} onPress={() => this.uploadMedia('document')}> 
+								<FontAwesome name={'paperclip'} size={ 100 } style={{color: 'black'}} /> 
+							</TouchableOpacity>
+							<TouchableOpacity style={styles.icon} onPress={() => this.uploadFromLibrary()}> 
+								<FontAwesome name={'image'} size={ 100 } style={{color: 'black'}} /> 
+							</TouchableOpacity>
+						</View>
+						<View style={styles.iconRow}>
+							<TouchableOpacity style={styles.icon} onPress={() => this.uploadMedia('video')}> 
+								<FontAwesome name={'play-circle'} size={ 100 } style={{color: 'black'}} /> 
+							</TouchableOpacity>
+							<TouchableOpacity style={styles.icon} onPress={() => this.uploadMedia('music')}> 
+								<FontAwesome name={'music'} size={ 100 } style={{color: 'black'}} /> 
+							</TouchableOpacity>
+						</View>
 					</View>
-					<View style={styles.iconRow}>
-						<TouchableOpacity style={styles.icon} onPress={() => this.uploadDocument('video')}> 
-							<FontAwesome name={'play-circle'} size={ 100 } style={{color: 'black'}} /> 
-						</TouchableOpacity>
-						<TouchableOpacity style={styles.icon} onPress={() => this.uploadDocument('music')}> 
-							<FontAwesome name={'music'} size={ 100 } style={{color: 'black'}} /> 
-						</TouchableOpacity>
-					</View>
-				</View>
-				<TouchableOpacity style={styles.button} onPress={() => this.noDoc('none')} >
+      			}
+    			
+				<TouchableOpacity style={styles.button} onPress={() => this.uploadMedia('none')} >
 					<Text style={{textAlign:'center', fontSize: 15, color: 'black'}}> None </Text>
 				</TouchableOpacity>
     			<View style={styles.arrowContainer} >
@@ -216,7 +229,8 @@ const styles = StyleSheet.create({
 	rightArrow: {
 		marginTop: 30,
 		marginLeft: '25%',
-	},button: {
+	},
+	button: {
 	    shadowColor: 'gray', 
 	    shadowOffset: { height: 3, width: 3 }, 
 	    shadowOpacity: 3, 
@@ -228,6 +242,13 @@ const styles = StyleSheet.create({
 	    borderRadius: 50,
 	    justifyContent: 'center',
 	    alignItems: 'center',
-	    flexDirection: 'row',
+	},
+	modalContent: {
+	    backgroundColor: 'white',
+	    padding: 22,
+	    justifyContent: 'center',
+	    alignItems: 'center',
+	    borderRadius: 4,
+	    borderColor: 'rgba(0, 0, 0, 0.1)',
 	},
 })

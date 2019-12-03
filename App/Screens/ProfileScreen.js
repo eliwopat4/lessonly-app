@@ -37,14 +37,6 @@ export default class ProfileScreen extends React.Component {
 		console.log('Logging out...');
 		this.props.navigation.navigate('Loading');
 	}
-	
-	menuAction = (action) => {
-  		if (action.localeCompare('OpenDrawer') === 0) {
-  			this.props.navigation.toggleDrawer();
-  		} else {
-  			this.props.navigation.navigate(action)
-  		}
-  	}
 
   	componentDidMount() {
   		var screen = this.props.navigation.getParam('screenA', 'null');
@@ -57,15 +49,14 @@ export default class ProfileScreen extends React.Component {
 	render() {
 		return (
 			<SafeAreaView style={styles.container}>
-				<Header navigate = {this.menuAction} />
+				<Header openDrawer = {this.props.navigation.toggleDrawer} navigate = {this.props.navigation.navigate} />
 				<Text style={styles.title} > Profile </Text>
 				<TouchableOpacity onPress={() => this.showCurrentUser()} >
-					<Text style={styles.temp}> Check User </Text>
+					<Text style={styles.title2} > Check User </Text>
 				</TouchableOpacity>
 				<TouchableOpacity onPress={() => this.logoutUser()} >
-					<Text> Logout </Text>
+					<Text style={styles.title2}> Logout </Text>
 				</TouchableOpacity>
-				<Button onPress={() => console.log(this.props.navigation.state)} title="click" />
 			</SafeAreaView>
 		)
 	}
@@ -78,6 +69,11 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	title: {
+		fontSize: 20,
+		fontWeight: 'bold',
+	},
+	title2: {
+		marginTop: 50,
 		fontSize: 20,
 		fontWeight: 'bold',
 	},

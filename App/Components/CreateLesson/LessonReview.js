@@ -9,10 +9,17 @@ import {
 	Button,
 	View,
 	ScrollView,
+	TouchableWithoutFeedback,
+	Keyboard,
 } from 'react-native';
 import { Metrics, Colors, Images } from '../../Themes';
 import { FontAwesome } from '@expo/vector-icons';
+import firebase from 'firebase';
 import Modal from 'react-native-modal';
+import firestore from '../../../firebase'
+
+const rootStore = firebase.storage().ref();
+const collRef = firestore.collection('users');
 
 export default class LessonReview extends Component {
 
@@ -42,6 +49,11 @@ export default class LessonReview extends Component {
 				errorMessage: 'Please do not leave your lesson name blank',
 				error: true,
 			})
+		} else if (this.state.lessonName.length > 8) {
+			this.setState({
+				errorMessage: 'Please choose a lesson name with 8 or less characters',
+				error: true,
+			})
 		} else {
 			this.setState({ isModalVisible: false });
 			setTimeout(() => {
@@ -65,52 +77,73 @@ export default class LessonReview extends Component {
     	}
 	}
 
-	testMethod = () => {
-		this.props.handleAction('media', 'none', 'LessonReview')
+	removeObject = async (type) => {
+		var mediaObject = {
+			type: 'none',
+			ref: '',
+		}
+		if(type.localeCompare('image') === 0) {
+			console.log(this.props.user+'/'+this.props.media.name)
+			var mediaRef = rootStore.child(this.props.user+'/'+this.props.media.name);
+
+			// Delete the file
+			mediaRef.delete().then(function() {
+			 	console.log('deleted media')
+			}).catch(function(error) {
+				console.log('error deleting media')
+				console.log(error)
+			});
+			this.props.handleAction('media', mediaObject, 'LessonReview')
+		}
 	}
 
 	getDocIcon = () => {
-		console.log(this.props.media)
-		switch(this.props.media) {
+		switch(this.props.media.type) {
 		  	case 'none':
+		  		return (<Text style={{marginBottom: 20}}> None </Text>);
+		    	break;
+		    case undefined:
 		  		return (<Text style={{marginBottom: 20}}> None </Text>);
 		    	break;
 		    case 'image':
 		    	return (
-		    		<View> 
-			    		<FontAwesome name={'image'} size={ 75 } style={{color: 'black'}} />
-			    		<TouchableOpacity onPress={() => this.testMethod()} >
-			    			<Text style={{fontWeight:'bold', fontSize:15, color:'red', textAlign:'center'}}> Remove </Text>
+		    		<View style={{alignItems: 'center'}}> 
+			    		<Image
+					  		source={{uri: this.props.media.ref}}
+					  		style={styles.mediaPicture}
+						/>
+			    		<TouchableOpacity onPress={() => this.removeObject('image')} >
+			    			<Text style={styles.removeText}> Remove </Text>
 			    		</TouchableOpacity>
 		    		</View>
 		    	);
 		    	break; 
 		    case 'video':
 		    	return (
-		    		<View>
+		    		<View style={{alignItems: 'center'}}>
 			    		<FontAwesome name={'play-circle'} size={ 75 } style={{color: 'black'}} />
-			    		<TouchableOpacity onPress={() => this.testMethod()} >
-			    			<Text style={{fontWeight:'bold', fontSize:15, color:'red', textAlign:'center'}}> Remove </Text>
+			    		<TouchableOpacity onPress={() => this.removeObject('video')} >
+			    			<Text style={styles.removeText}> Remove </Text>
 			    		</TouchableOpacity>
 		    		</View>
 		    	);
 		    	break; 
 		    case 'music':
 		    	return (
-		    		<View>
+		    		<View style={{alignItems: 'center'}}>
 			    		<FontAwesome name={'music'} size={ 75 } style={{color: 'black'}} />
-			    		<TouchableOpacity onPress={() => this.testMethod()} >
-			    			<Text style={{fontWeight:'bold', fontSize:15, color:'red', textAlign:'center'}}> Remove </Text>
+			    		<TouchableOpacity onPress={() => this.removeObject('music')} >
+			    			<Text style={styles.removeText}> Remove </Text>
 			    		</TouchableOpacity>
 		    		</View>
 		    		);
 		    	break; 
 		    case 'document':
 		    	return (
-		    		<View>
+		    		<View style={{alignItems: 'center'}}>
 			    		<FontAwesome name={'paperclip'} size={ 75 } style={{color: 'black'}} />
-			    		<TouchableOpacity onPress={() => this.testMethod()} >
-			    			<Text style={{fontWeight:'bold', fontSize:15, color:'red', textAlign:'center'}}> Remove </Text>
+			    		<TouchableOpacity onPress={() => this.removeObject('document')} >
+			    			<Text style={styles.removeText}> Remove </Text>
 			    		</TouchableOpacity>
 		    		</View>
 		    		);
@@ -265,4 +298,23 @@ const styles = StyleSheet.create({
 	  	borderWidth: 1,
 	  	backgroundColor: 'white',
 	},
+	mediaPicture: {
+		width: 200, 
+		height: 200,
+		resizeMode: 'contain', 
+		alignItems: 'center',
+	},
+	removeText: {
+		fontWeight:'bold', 
+		fontSize:15, 
+		color:'red', 
+		textAlign:'center',
+	},
 })
+
+
+
+
+
+
+

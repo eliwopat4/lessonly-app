@@ -13,7 +13,11 @@ import {
 import { Metrics, Colors, Images } from '../../Themes';
 import { FontAwesome } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import firebase from 'firebase';
+import firestore from '../../../firebase'
 
+const collRef = firestore.collection('users');
+const collRef2 = firestore.collection('lessons');
 
 export default class LessonShare extends Component {
 
@@ -33,7 +37,42 @@ export default class LessonShare extends Component {
   		this.props.handleAction('confirmation', this.state.text, 'LessonReview');
   	}
 
+  	uploadLesson = async () => {
+  		var lessons;
+  		var today = new Date();
+		var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+		var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+		var dateTime = date + ',' + time;
+  		var lessonObject = {
+  			objective: this.props.objective,
+  			materials: this.props.materials,
+  			instructions: this.props.instructions,
+  			media: this.props.media,
+  			lessonName: this.props.lessonName,
+  			author: this.props.user,
+  			rating: 'null',
+  			dateCreated: dateTime,
+  		}
+  		let docRef = firestore.doc('users/'+this.props.user);
+		let doc = await docRef.get();
+		// console.log(this.props.user, doc.data());
+	  	if(doc.data().lessons === undefined) {
+	  		lessons = [lessonObject]
+	  	} else if (doc.data().lessons.length === 0) {
+	  		lessons = [lessonObject]
+	  	} else {
+	  		lessons = doc.data().lessons
+	  		lessons.push(lessonObject)
+	  	}
+	  	data = { 
+			lessons: lessons,
+		}
+		let setDoc = collRef.doc(this.props.user).update(data);
+		let setLesson = collRef2.doc(this.props.lessonName).set(lessonObject);
+  	}
+
   	completed = () => {
+  		this.uploadLesson()
   		this.props.handleAction('confirmation', this.state.text, 'LessonSuccess');
   	}
 

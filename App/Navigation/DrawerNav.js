@@ -22,15 +22,15 @@ const DrawerNav = createDrawerNavigator(
         header: null
       },
     },
-    Search: {
-      screen: screens.SearchScreen,
+    Calendar: {
+      screen: screens.CalendarScreen,
       navigationOptions: {
         header: null
       },
     },
   }, 
   {
-    initialRouteName: 'Create',
+    initialRouteName: 'Home',
     contentComponent: CustomDrawer,
   }
 );

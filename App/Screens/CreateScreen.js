@@ -8,6 +8,7 @@ import {
 	Image,
 	Button,
 	View,
+	TouchableWithoutFeedback,
 } from 'react-native';
 import { Metrics, Colors, Images } from '../Themes';
 import Header from '../Components/Header';
@@ -18,6 +19,8 @@ import LessonMedia from '../Components/CreateLesson/LessonMedia';
 import LessonReview from '../Components/CreateLesson/LessonReview';
 import LessonShare from '../Components/CreateLesson/LessonShare';
 import LessonSuccess from '../Components/CreateLesson/LessonSuccess';
+import firebase from 'firebase';
+import firestore from '../../firebase'
 
 export default class CreateScreen extends React.Component {
 
@@ -25,6 +28,7 @@ export default class CreateScreen extends React.Component {
 	    super(props);
 
 	    this.state = {
+	    	user: '',
 	    	objective: '',
 	    	materials: '',
 	    	instructions: '',
@@ -33,18 +37,23 @@ export default class CreateScreen extends React.Component {
 	    	confirmation: '',
 	    	currComponent: 'LessonObjectives',
 	  	}
-
   	}
 
-
-  	componentWillUnmount() {
-  		this.props.navigation.setParams({ 
-  			prevScreen: this.props.navigation.state.routeName,
-  		});
+  	async componentWillMount() {
+  		console.log('called will mount')
+  		//console.log(this.state.currComponent)
+  		console.log(this.props.getParam())
+  		if(this.state.currComponent.localeCompare('LessonObjectives') !== 0) {
+  			this.setState({currComponent: 'LessonObjectives'})
+  		}
+  		var user = await firebase.auth().currentUser;
+  		// console.log('printing props...')
+  		// console.log(this.props.navigation)
+  		// console.log(this.props.screenProps)
+  		this.setState({user: user.email})
   	}
 
-
-  	handleAction = (state, txt, component) => {
+  	handleAction = (state, newState, component) => {
   		if (state.localeCompare('cleanup') === 0) {
   			this.setState({
   				objective: '',
@@ -56,10 +65,10 @@ export default class CreateScreen extends React.Component {
 		    	currComponent: 'LessonObjectives',
   			})
   		} else if (component.localeCompare(this.state.currComponent) === 0) {
-  			this.setState({ [state]: txt });
+  			this.setState({ [state]: newState });
   		} else {
   			this.setState({ 
-  				[state]: txt,
+  				[state]: newState,
   				currComponent: component
   			});
   		}
@@ -92,18 +101,15 @@ export default class CreateScreen extends React.Component {
 		}
   	}
 
-  	menuAction = (action) => {
-  		if (action.localeCompare('OpenDrawer') === 0) {
-  			this.props.navigation.toggleDrawer();
-  		} else {
-  			this.props.navigation.navigate(action)
-  		}
+  	navigate = (screen) => {
+  		this.props.screenProps = 'LessonObjectives';
+  		this.props.navigation.navigate(screen)
   	}
 
 	render() {
 		return (
 			<SafeAreaView style={styles.container}>
-				<Header navigate = {this.menuAction} />
+				<Header openDrawer = {this.props.navigation.toggleDrawer} navigate = {this.navigate} />
 	  			{this.getComponent()}
 			</SafeAreaView>
 			

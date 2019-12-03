@@ -5,7 +5,8 @@ import {
 	Text,
 	TextInput,
 	TouchableOpacity,
-	TouchableHighlight,
+	TouchableWithoutFeedback,
+	Keyboard,
 	Image,
 	Button,
 	View,
@@ -25,6 +26,7 @@ export default class LessonObjectives extends Component {
 
   	componentWillMount() {
   		this.setState({ text: this.props.objective })
+  		//console.log(this.props)
   	}
 
 
@@ -37,31 +39,33 @@ export default class LessonObjectives extends Component {
   		this.props.handleAction('objective', this.state.text, 'LessonMaterials');
   	}
 
+
 	render() {
 		return (
-			<View style={styles.container} >
-      			<Text style={styles.title} > What are the lesson <Text style={{fontWeight: 'bold'}}>objectives</Text>? </Text>
-      			<TextInput
-          			style={styles.input}
-			      	onChangeText={txt => this.updateText(txt)}
-			      	value={this.state.text}
-			      	placeholder={'Enter objective here'}
-			      	multiline={true}
-			      	keyboardShouldPersistTaps='handled'
-    			/>
-    			<View style={styles.arrowContainer} >
-    				<View style={styles.leftArrow} >
-	    				<TouchableOpacity> 
-	    					<FontAwesome name={'arrow-left'} size={ 50 } style={{color: 'white'}} /> 
-	    				</TouchableOpacity>
-    				</View>
-    				<View style={styles.rightArrow} >
-	    				<TouchableOpacity onPress={() => this.clickedArrow() }>
-	    					<FontAwesome name={'arrow-right'} size={ 50 } style={{color: 'black'}} /> 
-	    				</TouchableOpacity>
-    				</View>
-    			</View>
-    		</View>
+			<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()} >
+				<View style={styles.container} >
+	      			<Text style={styles.title} > What are the lesson <Text style={{fontWeight: 'bold'}}>objectives</Text>? </Text>
+	      			<TextInput
+	          			style={styles.input}
+				      	onChangeText={txt => this.updateText(txt)}
+				      	value={this.state.text}
+				      	placeholder={'Enter objective here'}
+				      	multiline={true}
+	    			/>
+	    			<View style={styles.arrowContainer} >
+	    				<View style={styles.leftArrow} >
+		    				<TouchableOpacity> 
+		    					<FontAwesome name={'arrow-left'} size={ 50 } style={{color: 'white'}} /> 
+		    				</TouchableOpacity>
+	    				</View>
+	    				<View style={styles.rightArrow} >
+		    				<TouchableOpacity onPress={() => this.clickedArrow() }>
+		    					<FontAwesome name={'arrow-right'} size={ 50 } style={{color: 'black'}} /> 
+		    				</TouchableOpacity>
+	    				</View>
+	    			</View>
+	    		</View>
+	    	</TouchableWithoutFeedback>
 		);
 	}
 }
