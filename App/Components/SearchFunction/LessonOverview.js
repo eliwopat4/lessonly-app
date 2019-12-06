@@ -14,6 +14,11 @@ import {
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import Modal from 'react-native-modal';
+import firebase from 'firebase';
+import firestore from '../../../firebase';
+import StarRating from 'react-native-star-rating';
+
+const usersRef = firestore.collection('lessons');
 
 
 export default class LessonReview extends Component {
@@ -26,6 +31,7 @@ export default class LessonReview extends Component {
 	    	error: false,
 	    	errorMessage: '',
 	    	lessonName: '',
+	    	reviews: [],
 	  	}
   	}
 
@@ -105,13 +111,48 @@ export default class LessonReview extends Component {
 		this.toggleModal()
 	}
 
-	getLessonReviews = () => {
-		if(this.props.lesson.reviews === undefined) {
+	getLessonReviews = async () => {
+		let docs = await firestore.collection('lessons/'+this.props.lesson.lessonName+'/reviews').get();
+		let reviews = [];
+		docs.forEach((doc) => {
+			//console.log(doc.data())
+			reviews.push(doc.data())
+		});	
+		this.setState({ reviews : reviews });
+		//return reviews;
+	}
+
+	returnLessonReviews = () => {
+		this.getLessonReviews()
+		//console.log(this.state.reviews)
+
+		if(this.state.reviews === undefined) {
 			return (<Text style={{marginBottom: 20}}> No reviews currently for this lesson. </Text>);
-		} else if(this.props.lesson.reviews.length === 0) {
+		} else if(this.state.reviews.length === 0) {
 			return (<Text style={{marginBottom: 20}}> No reviews currently for this lesson. </Text>);
 		} else {
-			return (<Text style={{marginBottom: 20}}> {this.props.lesson.reviews} </Text>);
+			return this.state.reviews.map((review, index) => {
+				return (
+					<View key={index}>
+						<View style={styles.starRating} >
+							<StarRating
+						        disabled={false}
+						        maxStars={5}
+						        emptyStar={'ios-star-outline'}
+						        fullStar={'ios-star'}
+						        halfStar={'ios-star-half'}
+						        iconSet={'Ionicons'}
+						        rating={review.rating}
+						        fullStarColor={'darkviolet'}
+						    />
+					    </View>
+					    <Text > {review.like} </Text>
+					    <Text > {review.wish} </Text>
+					    <Text style={{marginBottom: 20}}> {review.wonder} </Text>
+					</View>
+				);
+			});
+
 		}
 	}
 
@@ -175,7 +216,7 @@ export default class LessonReview extends Component {
 							{this.getDocIcon()}
 
 							<Text style={{fontWeight: 'bold'}}> Reviews </Text>
-							{this.getLessonReviews()}
+							{this.returnLessonReviews()}
 		      			</ScrollView>
 	      			</View>
 	    			<View style={styles.arrowContainer} >
@@ -201,6 +242,15 @@ const styles = StyleSheet.create({
 		width: '100%',
 		height: '100%',
 		alignItems: 'center',	
+	},
+	starRating: {
+		flex: 1,
+    	resizeMode: 'contain',
+		width: '30%',
+		height: '20%',
+		// resizeMode: 'cover',
+		// marginLeft: '10%',
+		// borderWidth: 1,
 	},
 	title: {
 		width: '80%',

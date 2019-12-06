@@ -51,7 +51,7 @@ export default class HomeScreen extends React.Component {
 		    	datePicked: '',
   			})
   		} else if (component.localeCompare(this.state.currComponent) === 0) {
-  			console.log('updating '+state+'...');
+  			//console.log('updating '+state+'...');
   			this.setState({ [state]: newState });
   		} else {
   			this.setState({ 

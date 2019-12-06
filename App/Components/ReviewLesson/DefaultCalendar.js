@@ -12,6 +12,10 @@ import {
 import { Metrics, Colors, Images } from '../../Themes';
 import CalendarPicker from 'react-native-calendar-picker';
 import { FontAwesome } from '@expo/vector-icons';
+import firebase from 'firebase';
+import firestore from '../../../firebase';
+
+const lessonsRef = firestore.collection('lessons');
 
 export default class DefaultCalendar extends React.Component {
 

@@ -41,54 +41,23 @@ export default class YourReview extends Component {
 			lastName: this.props.user.lastName,
 		}
   		var reviewObject = {
-  			reviewer: user,
   			like: this.props.like,
   			wish: this.props.wish,
   			wonder: this.props.wonder,
   			rating: this.props.rating,
+  			reviewer: user,
   			dateCreated: dateTime,
   		}
 
-
-  		console.log(reviewObject)
-  		console.log('Current Lesson being reviewed: ' + this.props.lesson.lessonName)
-
-  		
   		// UPDATE Lesson in Users collection
-  		let userRef = firestore.doc('users/'+this.props.lesson.author.email);
-		let userInfo = await userRef.get();
-		var reviewsCopy = [];
-		var userLessons = userInfo.data().lessons;
-		var userLessonsCopy = [];
-		userLessons.forEach(lesson => {
-
-			if(lesson.lessonName === this.props.lesson.lessonName) {
-				//console.log(lesson);
-				if(lesson.reviews === undefined) {
-			  		lesson.reviews = [reviewObject]
-			  	} else if (lesson.lessons.length === 0) {
-			  		lesson.reviews = [reviewObject]
-			  	} else {
-			  		reviewsCopy = lesson.reviews
-			  		reviewsCopy.push(reviewsCopy)
-			  		lesson.reviews = reviewsCopy;
-			  	}
-			  	//console.log(lesson);
-			}
-
-			userLessonsCopy.append(lesson)
-		});
-		console.log(typeof userLessonsCopy)
-
-		let setDoc = collRef.doc(this.props.lesson.author.email).update(data);
-		let setLesson = collRef2.doc(this.props.lesson.lessonName).set(lessonObject);
-
+  		// console.log('users/'+this.props.lesson.author.email+'/lessons/'+this.props.lesson.lessonName+'/reviews')
+  		let userRef = firestore.collection('users/'+this.props.lesson.author.email+'/lessons/'+this.props.lesson.lessonName+'/reviews').doc(reviewObject.reviewer.email);
+		let test = userRef.set(reviewObject);
 
 		// UPDATE Lesson in Lessons collection
-		// let lessonRef = firestore.doc('lessons/'+this.props.lesson.lessonName);
-		// let dbLesson = await lessonRef.get();
-		// console.log('USER DATA: ')
-		// console.log(dbLesson.data())
+  		// console.log('lessons/'+this.props.lesson.lessonName+'/reviews')
+  		userRef = firestore.collection('lessons/'+this.props.lesson.lessonName+'/reviews').doc(reviewObject.reviewer.email);
+		test = userRef.set(reviewObject);
 
   	}
 
@@ -98,8 +67,8 @@ export default class YourReview extends Component {
 		} catch(error) {
 			console.log(error.message)
 		}
-		//await this.uploadReview()
-  		this.props.setComponent('ReviewSubmitted')
+		await this.uploadReview()
+  		this.props.setScreenState('cleanup')
   	}
 
 	render() {

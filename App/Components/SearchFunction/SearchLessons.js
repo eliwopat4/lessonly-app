@@ -31,7 +31,6 @@ export default class SearchLessons extends React.Component {
 	    	lessons: [],
 	    	data: [],
 	  	}
-  		this.getLessons = this.getLessons.bind(this);
   	}
 
   	componentWillMount = () => {
@@ -64,17 +63,8 @@ export default class SearchLessons extends React.Component {
 		let docs = await usersRef.get();
 		let lessonsCopy = [];
 		docs.forEach((doc) => {
-			lesson = {
-				lessonName: doc.data().lessonName,
-				objective: doc.data().objective,
-	  			materials: doc.data().materials,
-	  			instructions: doc.data().instructions,
-	  			media: doc.data().media,
-	  			author: doc.data().author,
-	  			rating: 'null',
-	  			dateCreated: doc.data().dateCreated,
-			}
-			lessonsCopy.push(lesson)
+			// console.log(doc.data())
+			lessonsCopy.push(doc.data())
 		});	
 		this.setState({ lessons: lessonsCopy})
 		this.setState({ data: lessonsCopy})

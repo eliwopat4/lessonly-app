@@ -51,18 +51,23 @@ export default class CalendarScreen extends React.Component {
   	}
 
   	setScreenState = (state, txt) => {
-  		this.setState({ [state] : txt })
-  	}
-
-  	getScreenState = (passedState) => {
-  		if(passedState.localeCompare('like') === 0) {
-  			return this.state.like;
-  		} else if(passedState.localeCompare('wish') === 0) {
-  			return this.state.wish;
-  		} else if(passedState.localeCompare('wonder') === 0) {
-  			return this.state.wonder;
+  		if(state === 'cleanup') {
+  			this.setState({ 
+	  			currComponent: 'ReviewSubmitted',
+		    	like: '',
+		    	wish: '',
+		    	wonder: '',
+		    	rating: 0,
+		    	hasRated: false,
+		    	datePicked: '',
+		    	lesson: '',
+		    	user: '',
+  			})
+  		} else {
+  			this.setState({ [state] : txt })
   		}
   	}
+
 
   	setComponent = (newComponent) => {
   		this.setState({ currComponent: newComponent})
@@ -87,7 +92,7 @@ export default class CalendarScreen extends React.Component {
 		  		return (<ReviewFinishedLesson {...this.state} setComponent = {this.setComponent}  setScreenState = {this.setScreenState}/>);
 		    	break;
 		    case 'YourReview':
-		  		return (<YourReview {...this.state} setComponent = {this.setComponent}/>);
+		  		return (<YourReview {...this.state} setScreenState = {this.setScreenState}/>);
 		    	break;	
 		    case 'ReviewSubmitted':
 		  		return (<ReviewSubmitted setComponent = {this.setComponent} navigate = {this.props.navigation.navigate} />);

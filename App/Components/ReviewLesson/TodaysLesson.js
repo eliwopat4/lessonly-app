@@ -16,6 +16,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import firebase from 'firebase';
 import firestore from '../../../firebase';
+import StarRating from 'react-native-star-rating';
 
 const lessonsRef = firestore.collection('lessons');
 
@@ -27,13 +28,18 @@ export default class TodaysLesson extends Component {
 	    this.state = {
 	    	lesson: '',
 	    	loading: true,
+	    	reviews: [],
+	    	reviewsShow: false,
 	    }
 	}
 
-  	async componentDidMount() {
+
+	async componentWillMount() {
+		console.log('mounting...')
 		let docs = await lessonsRef.get();
 		let lessonsCopy = [];
 		docs.forEach((doc) => {
+			// console.log(doc.data())
 			lesson = {
 				lessonName: doc.data().lessonName,
 				objective: doc.data().objective,
@@ -47,18 +53,45 @@ export default class TodaysLesson extends Component {
 			lessonsCopy.push(lesson)
 		});	
 		var array_length = (lessonsCopy.length-1)
-		console.log(array_length)
-		var index = Math.floor((Math.random() * array_length + 1));
-		console.log(index)
-		this.setState({ lesson : lessonsCopy[index], loading: false })
+		var index = Math.floor((Math.random() * array_length));
 		this.props.setScreenState('lesson', lessonsCopy[index])
-		// console.log(this.state.lesson)
-  	}
+		// this.setState({lesson:lessonsCopy[index], loading: false})
+
+		docs = await firestore.collection('lessons/'+this.props.lesson.lessonName+'/reviews').get();
+		let reviews = [];
+		docs.forEach((doc) => {
+			//console.log(doc.data())
+			reviews.push(doc.data())
+		});	
+		if(reviews !== undefined) {
+			console.log('here')
+			this.setState({ 
+				lesson:lessonsCopy[index],
+				reviews : reviews,
+				reviewsShow: true,
+				loading: false,
+			});
+		} else if(reviews.length !== 0) {
+			console.log('here2')
+			this.setState({ 
+				lesson:lessonsCopy[index],
+				reviews : reviews,
+				reviewsShow: true,
+				loading: false,
+			});
+		} else {
+			console.log('here3')
+			this.setState({ 
+				lesson:lessonsCopy[index],
+				reviews : reviews,
+				loading: false,
+			});
+		}
+	}
 
   	getDocIcon = () => {
-		// console.log(this.state.lesson.media.type)
-		// console.log(this.state.lesson.media.ref)
-		switch(this.state.lesson.media.type) {
+		console.log(this.props.lesson.media)
+		switch(this.props.lesson.media.type) {
 		  	case 'none':
 		  		return (<Text style={{marginBottom: 20}}> None </Text>);
 		    	break;
@@ -66,15 +99,18 @@ export default class TodaysLesson extends Component {
 		  		return (<Text style={{marginBottom: 20}}> None </Text>);
 		    	break;
 		    case 'image':
-		    	console.log(this.state.lesson.media.ref)
-		    	//{uri: this.state.lesson.media.ref} 
-		    	// {Images.FiveStarRating
 		    	return (
 		    		<View style={{alignItems: 'center'}}> 
-			    		<Image
-					  		source={{uri: 'https://firebasestorage.googleapis.com/v0/b/lessonly-5ae13.appspot.com/o/%5Bobject%20Object%5D%2F57BB9398-094D-4D9D-95F1-CC6AA2116A15.jpg?alt=media&token=a60a562d-bd17-428f-97ef-de2a9f9e39d9' }}
+		    		{
+		    			this.state.loading ?
+		    			<ActivityIndicator size="large" color="#0000ff" />
+		    			:
+		    			<Image
+					  		source={{uri: this.props.lesson.media.ref}}
 					  		style={styles.mediaPicture}
 						/>
+		    		}
+			    		
 		    		</View>
 		    	);
 		    	break; 
@@ -100,17 +136,7 @@ export default class TodaysLesson extends Component {
 		    		);
 		    	break; 
 		  	default:
-		    	return (<Text style={{marginBottom: 20}}> None </Text>);
-		}
-	}
-
-	getLessonReviews = () => {
-		if(this.state.lesson.reviews === undefined) {
-			return (<Text style={{marginBottom: 20}}> No reviews currently for this lesson. </Text>);
-		} else if(this.state.lesson.reviews.length === 0) {
-			return (<Text style={{marginBottom: 20}}> No reviews currently for this lesson. </Text>);
-		} else {
-			return (<Text style={{marginBottom: 20}}> {this.state.lesson.reviews} </Text>);
+		    	return (<Text style={{marginBottom: 20}}> Error </Text>);
 		}
 	}
 
@@ -140,10 +166,67 @@ export default class TodaysLesson extends Component {
 		      				<Text style={{marginBottom: 20}}> {this.state.lesson.instructions} </Text>
 		      				
 		      				<Text style={{fontWeight: 'bold'}}> Media </Text>
-							{this.getDocIcon()}
+		      				{console.log(this.props.lesson.media.type)}
+							{
+							  	(this.props.lesson.media.type === 'none') ?
+							  			<Text style={{marginBottom: 20}}> None </Text>
+							  	:
+							    (this.props.lesson.media.type === 'undefined') ?
+							  		<Text style={{marginBottom: 20}}> None </Text>
+							  	:
+							    (this.props.lesson.media.type === 'image') ?
+					    			<Image
+								  		source={{uri: this.props.lesson.media.ref}}
+								  		style={styles.mediaPicture}
+									/>
+						    	:
+						    	(this.props.lesson.media.type === 'video') ?
+						    		<View style={{alignItems: 'center'}}>
+							    		<FontAwesome name={'play-circle'} size={ 75 } style={{color: 'black'}} />
+						    		</View>
+						    	:
+		    					(this.props.lesson.media.type === 'music') ?
+						    		<View style={{alignItems: 'center'}}>
+							    		<FontAwesome name={'music'} size={ 75 } style={{color: 'black'}} />
+						    		</View>
+ 								:
+							    (this.props.lesson.media.type === 'document') ?
+						    		<View style={{alignItems: 'center'}}>
+							    		<FontAwesome name={'paperclip'} size={ 75 } style={{color: 'black'}} />
+						    		</View>
+						    	:
+						    	null
+							}
 
 							<Text style={{fontWeight: 'bold'}}> Reviews </Text>
-							{this.getLessonReviews()}
+							{	
+								this.state.reviewsShow ?
+									this.state.reviews.map((review, index) => {
+										return(
+											<View key={index}>
+												<View style={styles.starRating} >
+													<StarRating
+												        disabled={false}
+												        maxStars={5}
+												        emptyStar={'ios-star-outline'}
+												        fullStar={'ios-star'}
+												        halfStar={'ios-star-half'}
+												        iconSet={'Ionicons'}
+												        rating={review.rating}
+												        fullStarColor={'darkviolet'}
+												    />
+											    </View>
+											    <Text > I like: {review.like} </Text>
+											    <Text > I wish: {review.wish} </Text>
+											    <Text > I wonder: {review.wonder} </Text>
+											    <Text style={{marginBottom: 20}}> By: {review.reviewer.firstName} {review.reviewer.lastName}</Text>
+											</View>
+										)
+									})
+								:
+								<Text style={{marginBottom: 20}}> No reviews currently for this lesson. </Text>
+							}
+
 		      			</ScrollView>
 	      			</View>
 	    			<View style={styles.arrowContainer} >
@@ -181,6 +264,15 @@ const styles = StyleSheet.create({
 		fontSize: 25,
 		marginTop: 30,
 		textAlign: 'center',	
+	},
+	starRating: {
+		flex: 1,
+    	resizeMode: 'contain',
+		width: '30%',
+		height: '20%',
+		// resizeMode: 'cover',
+		// marginLeft: '10%',
+		// borderWidth: 1,
 	},
 	subtitle: {
 		width: '80%',
