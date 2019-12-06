@@ -34,15 +34,12 @@ export default class HomeScreen extends React.Component {
 	    this.state = {
 	    	search: '',
 	    	lessons: [],
-	    	data: [],
 	    	currComponent: 'DefaultSearch',
 	    	lesson: ''
 	  	}
   	}
 
 	handleAction = (state, newState, component) => {
-		// console.log('stateChange: '+state+' to '+newState)
-		// console.log('update component to: '+component)
 		if(state.localeCompare('currComponent') === 0) {
 			this.setState({ [state]: newState });
 		} else if (state.localeCompare('cleanUp') === 0) {

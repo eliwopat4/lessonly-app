@@ -50,7 +50,7 @@ export default class LessonMedia extends Component {
 	    const blob = await response.blob();
 	    let splitURI = uri.split('/');
 	    let filename = splitURI[splitURI.length - 1];
-	    var ref = rootStore.child(this.props.user+'/'+filename);
+	    var ref = rootStore.child(this.props.user.email+'/'+filename);
 	    let task = ref.put(blob);
 	    return {task, ref, filename};
   	}

@@ -39,6 +39,7 @@ export default class CustomDrawer extends Component {
             user: doc.data(),
             loading: false,
         });
+        console.log(this.state.user)
     }
 
 	navigateToScreen = ( route ) =>(

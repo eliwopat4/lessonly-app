@@ -17,9 +17,18 @@ export default class DefaultCalendar extends React.Component {
 
 	constructor(props) {
 	    super(props);
+
+	    this.state = {
+	    	datePicked: '',
+	    }
   	}
 
-  	onDateChange = () => {
+  	onDateChange = (date) => {
+  		var res = (date.toString()).split(" ");
+		// var parsedDate = res[0] + ' ' + res[1] + ' ' + res[2] + ' ' + res[3]
+		this.setState({ datePicked: res[2]});
+		this.props.setScreenState('datePicked', res[2])
+		// console.log(parsedDate)
   		this.props.setComponent('TodaysLesson')
   	}
 

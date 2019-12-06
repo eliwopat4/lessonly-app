@@ -18,6 +18,10 @@ export default class AskToReview extends Component {
 
 	constructor(props) {
 	    super(props);
+
+	    this.state ={
+	    	lesson: ''
+	    }
   	}
 
   	reset = () => {
@@ -25,57 +29,102 @@ export default class AskToReview extends Component {
   		this.props.navigate('Home')
   	}
 
+  	componentWillMount = () => {
+  		this.setState({lesson:this.props.lesson})
+  		// console.log(this.state.lesson)
+  	}
+
+	getDocIcon = () => {
+		// console.log(this.props.lesson.media)
+		switch(this.props.lesson.media.type) {
+		  	case 'none':
+		  		return (<Text style={{marginBottom: 20}}> None </Text>);
+		    	break;
+		    case undefined:
+		  		return (<Text style={{marginBottom: 20}}> None </Text>);
+		    	break;
+		    case 'image':
+		    	return (
+		    		<View style={{alignItems: 'center'}}> 
+			    		<Image
+					  		source={{uri: this.state.lesson.media.ref}}
+					  		style={styles.mediaPicture}
+						/>
+		    		</View>
+		    	);
+		    	break; 
+		    case 'video':
+		    	return (
+		    		<View style={{alignItems: 'center'}}>
+			    		<FontAwesome name={'play-circle'} size={ 75 } style={{color: 'black'}} />
+		    		</View>
+		    	);
+		    	break; 
+		    case 'music':
+		    	return (
+		    		<View style={{alignItems: 'center'}}>
+			    		<FontAwesome name={'music'} size={ 75 } style={{color: 'black'}} />
+		    		</View>
+		    		);
+		    	break; 
+		    case 'document':
+		    	return (
+		    		<View style={{alignItems: 'center'}}>
+			    		<FontAwesome name={'paperclip'} size={ 75 } style={{color: 'black'}} />
+		    		</View>
+		    		);
+		    	break; 
+		  	default:
+		    	return (<Text style={{marginBottom: 20}}> None </Text>);
+		}
+	}
+
+	getLessonReviews = () => {
+		if(this.props.lesson.reviews === undefined) {
+			return (<Text style={{marginBottom: 20}}> No reviews currently for this lesson. </Text>);
+		} else if(this.props.lesson.reviews.length === 0) {
+			return (<Text style={{marginBottom: 20}}> No reviews currently for this lesson. </Text>);
+		} else {
+			return (<Text style={{marginBottom: 20}}> {this.props.lesson.reviews} </Text>);
+		}
+	}
+
 	render() {
 		return (
-			<View style={styles.container}>
-				<Text style={styles.title} >Would you like to <Text style={{fontWeight: 'bold'}}>review</Text> this lesson?</Text>
-				<View style={styles.instructor}>
-					<View style={styles.profilePicture}>
-		            		<Image source={Images.Norbury} />
-		            </View>
-					<View style={styles.rating}>
-							<Text style={styles.subtitle} ><Text style={{fontWeight: 'bold'}}>The Derivative Game</Text></Text>
-		            		<Text style={{fontWeight: 'bold'}}> Ms. Norbury </Text>
-		            		<Image source={Images.Rating} />
-		            </View>
-	            </View>
-	            <View style={styles.scrollview}>
-	      			<ScrollView > 
-	      				<Text style={styles.bodyTitle}>Objective </Text>
-	      				<Text style={styles.body}> Memorize derivative rules quickly.</Text>
-	      				
-	      				<Text style={styles.bodyTitle}>Materials </Text>
-	      				<Text style={styles.body}> -Graph paper</Text>
-	      				<Text style={styles.body}> -Ruler</Text>
-	      				<Text style={styles.body}> -Crayons</Text>
-	      				
-	      				<Text style={styles.bodyTitle}>Instructions </Text>
-	      				<Text style={styles.body}> 1. Students draw quadratics</Text>
-	      				<Text style={styles.body}> 2. Watch students succeed</Text>
-	      				<Text style={styles.body}> 3. Bask in the glory of success</Text>
+			<View style={styles.container}> 
+				<View style={styles.container}>
+					<Text style={styles.title} >Today's Lesson</Text>
+					<Text style={styles.subtitle} > Lesson: <Text style={{fontWeight: 'bold'}} >{this.props.lesson.lessonName} </Text> </Text>
+					<Image source={Images.Rating} style={{marginTop: 10}}/>
+	      			<Text style={styles.subtitle} > Created by: <Text style={{fontWeight: 'bold'}} >{this.props.lesson.author.firstName} {this.props.lesson.author.lastName} </Text> </Text>
+		            <View style={styles.scrollview}>
+		      			<ScrollView > 
+		      				<Text style={{fontWeight: 'bold'}}> Objective </Text>
+		      				<Text style={{marginBottom: 20}}> {this.props.lesson.objective} </Text>
+		      				
+		      				<Text style={{fontWeight: 'bold'}}> Materials </Text>
+		      				<Text style={{marginBottom: 20}}> {this.props.lesson.materials} </Text>
+		      				
+		      				<Text style={{fontWeight: 'bold'}}> Instructions </Text>
+		      				<Text style={{marginBottom: 20}}> {this.props.lesson.instructions} </Text>
+		      				
+		      				<Text style={{fontWeight: 'bold'}}> Media </Text>
+							{this.getDocIcon()}
 
-	      				<Text style={{fontWeight: 'bold'}}>Media </Text>
-	      				<View style = {styles.media}>
-		      				<TouchableOpacity style={styles.icon}> 
-								<FontAwesome name={'paperclip'} size={ 50 } style={{color: 'black'}} /> 
-							</TouchableOpacity>
-							<TouchableOpacity style={styles.video}>
-	            				<Image source={Images.MeanGirls}/>
-	            			</TouchableOpacity>
-							<TouchableOpacity style={styles.icon}> 
-								<FontAwesome name={'music'} size={ 50 } style={{color: 'black'}} /> 
-							</TouchableOpacity>
-	      				</View>
-	      			</ScrollView>
-      			</View>
-				<LinearGradient colors={[Colors.lg1, Colors.lg2, Colors.lg3]} style={styles.button} >
-	        		<TouchableOpacity style={ styles.innerButton } onPress={() => this.props.setComponent('ReviewFinishedLesson') } >
-				    	<Text style={{fontSize:20, textAlign:'center'}} > Yes! </Text>
-					</TouchableOpacity>
-				</LinearGradient>
-				<TouchableOpacity style={styles.textLink} onPress={() => this.reset() } >
-		         	<Text style={styles.no}> No thanks, I have no feedback </Text>
-		       	</TouchableOpacity>
+							<Text style={{fontWeight: 'bold'}}> Reviews </Text>
+							{this.getLessonReviews()}
+		      			</ScrollView>
+	      			</View>
+	      			<LinearGradient colors={[Colors.lg1, Colors.lg2, Colors.lg3]} style={styles.button} >
+		        		<TouchableOpacity style={ styles.innerButton } onPress={() => this.props.setComponent('ReviewFinishedLesson') } >
+					    	<Text style={{fontSize:20, textAlign:'center'}} > Yes! </Text>
+						</TouchableOpacity>
+					</LinearGradient>
+					<TouchableOpacity style={styles.textLink} onPress={() => this.reset() } >
+			         	<Text style={{textDecorationLine: 'underline', fontSize: 13, fontWeight: 'bold'}}> No thanks, I have no feedback </Text>
+			       	</TouchableOpacity>
+	      		</View>
+				
 			</View>
 		);
 	}
@@ -83,51 +132,25 @@ export default class AskToReview extends Component {
 
 const styles = StyleSheet.create({
 	container: {
-		flex: 1,
-		backgroundColor: 'white',
-		alignItems: 'center',
+		width: '100%',
+		height: '100%',
+		alignItems: 'center',	
 	},
 	title: {
 		width: '80%',
-		marginTop: '5%',
-		marginBottom: '5%',
 		fontSize: 25,
-		textAlign: 'left',	
+		marginTop: 30,
+		textAlign: 'center',	
 	},
 	subtitle: {
-		width: '100%',
+		width: '80%',
 		fontSize: 20,
-		textAlign: 'left',	
+		marginTop: 10,
+		textAlign: 'center',
 	},
-	bodyTitle: {
-		marginBottom: 20,
-		fontWeight: 'bold'
-	},
-	body: {
-		marginBottom: 20,
-	},
-	instructor: {
-		flexDirection: 'row',
-		width:'80%',
-		alignItems: 'flex-start',
-		justifyContent: 'flex-start',
-		marginBottom: 15,
-	},
-	profilePicture: {
-    	width: 70,
-    	height: 70,
-	},
-	video: {
-    	width: 70,
-    	height: 70,
-    	marginLeft: '17%',
-    	marginRight: '17%',
-    	justifyContent: 'center',
-		alignItems: 'center',
-    },
 	scrollview: {
 		width: '80%', 
-		height: '45%',
+		height: '50%',
 		padding: 10, 
 		marginBottom: 30,
 		backgroundColor: 'white',
@@ -138,21 +161,7 @@ const styles = StyleSheet.create({
 	    shadowOpacity: 3, 
 	    shadowRadius: 3, 
 	  	backgroundColor: 'white',
-	},
-	icon: {
-		height: 62.5,
-		width: 62.5,
-		borderWidth:1,
-		justifyContent: 'center',
-		alignItems: 'center',
-	  	shadowColor: 'gray', 
-	    shadowOffset: { height: 2, width: 2 }, 
-	    shadowOpacity: 2, 
-	    shadowRadius: 2, 
-	  	backgroundColor: 'white',
-	},
-	media: {
-		flexDirection: 'row',
+	  	marginTop: 10,
 	},
 	button: {
 	    shadowColor: 'gray', 
@@ -166,7 +175,7 @@ const styles = StyleSheet.create({
 	    justifyContent: 'center',
 	    alignItems: 'center',
 	    flexDirection: 'row',
-		marginTop: 20,
+		marginTop: 10,
 		marginBottom: 20,
 	},
 	innerButton: {
@@ -184,10 +193,5 @@ const styles = StyleSheet.create({
 	textLink: {
 		alignItems: 'center',
 		justifyContent: 'center',
-	},
-	no: {
-		fontSize: 15,
-		textDecorationLine: 'underline',
-		fontWeight: 'bold',
 	},
 })

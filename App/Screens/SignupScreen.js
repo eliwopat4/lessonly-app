@@ -27,6 +27,8 @@ export default class SignupScreen extends React.Component {
     		password: '',
 	    	isModalVisible: false,
 	    	modalMessage: '',
+	    	firstName: '',
+	    	lastName: '',
   		}
   	}
 
@@ -40,8 +42,16 @@ export default class SignupScreen extends React.Component {
   		this.setState({email: txt})
 	}
 
+	updateFirstName = (txt) => {
+  		this.setState({firstName: txt})
+	}
 
- 	async addUser(email, password) {
+	updateLastName = (txt) => {
+  		this.setState({lastName: txt})
+	}
+
+
+ 	async addUser(email, password, firstName, lastName) {
 	  	var user;
 		try {
 			user = await firebase.auth().currentUser
@@ -68,25 +78,29 @@ export default class SignupScreen extends React.Component {
 			this.createModal(error.message)
 		}
     	if (user !== null) {
-			this.addUserToDatabase(email, password);
+			this.addUserToDatabase(email, password, firstName, lastName);
   			this.createModal('Successfully added user!');
     	}	
   	}
 
 
-	signupAttempt(email, password) {
+	signupAttempt(email, password, firstName, lastName) {
 		if (email.length === 0 || password.length === 0) {
 			this.createModal('Please do not leave email and/or password blank.')
+		} else if (firstName.length === 0 || lastName.length === 0) {
+			this.createModal('Please do not leave first and/or last name blank.')
 		} else {
-	  	this.addUser(email, password);
+	  	this.addUser(email, password, firstName, lastName);
 		}
   	}	
 
 
-  	async addUserToDatabase(email, password) {
+  	async addUserToDatabase(email, password, firstName, lastName) {
 		let data = { 
 			email: email, 
 			password: password,
+			firstName: firstName,
+			lastName: lastName,
 		};
 		let setDoc = collRef.doc(email).set(data);
 	}
@@ -125,6 +139,18 @@ export default class SignupScreen extends React.Component {
 					    </Modal>
 		      			<Image source={Images.LessonlyWhiteBulb} style={styles.lessonlyBulb} /> 
 						<Text style={styles.loginLabel}> Sign Up </Text>
+						<TextInput
+				            style={styles.input}
+				            onChangeText={(txt) => this.updateFirstName(txt)} 
+				            placeholder={'First Name'}
+				            autoCapitalize = 'none'
+				        />
+				        <TextInput
+				            style={styles.input}
+				            onChangeText={(txt) => this.updateLastName(txt)} 
+				            placeholder={'Last Name'}
+				            autoCapitalize = 'none'
+				        />
 				        <TextInput
 				            style={styles.input}
 				            onChangeText={(txt) => this.updateEmail(txt)} 
@@ -138,7 +164,7 @@ export default class SignupScreen extends React.Component {
 				            secureTextEntry={true}
 				            autoCapitalize = 'none'
 				        />
-				       	<TouchableOpacity style={styles.button} onPress={() => this.signupAttempt(this.state.email, this.state.password)} >
+				       	<TouchableOpacity style={styles.button} onPress={() => this.signupAttempt(this.state.email, this.state.password, this.state.firstName, this.state.lastName)} >
 				         	<Text> Sign Up </Text>
 				       	</TouchableOpacity>
 				       	<TouchableOpacity style={styles.button} onPress={() => this.props.navigation.navigate('Login') } >

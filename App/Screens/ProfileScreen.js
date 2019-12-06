@@ -13,7 +13,7 @@ import {
 import { Metrics, Colors, Images } from '../Themes';
 import firebase from 'firebase';
 import firestore from '../../firebase'
-import MyHeader from '../Components/MyHeader';
+import Header from '../Components/Header';
 import MySearchResults from '../Components/MySearchResults';
 import ViewMyLesson from '../Components/ViewMyLesson';
 
@@ -29,6 +29,7 @@ export default class ProfileScreen extends React.Component {
 	    	lessons: [],
 	    	loading: true,
 	    	viewLesson: false,
+	    	lessonsEmpty: true,
 	  	}
   	}
 
@@ -46,7 +47,13 @@ export default class ProfileScreen extends React.Component {
   			lessons: doc.data().lessons,
   			loading: false,
   		});
-  		// console.log(this.state.lessons)
+  		if(this.state.lessons === undefined) {
+  			this.setState({lessonsExist:false});
+  		} else if(this.state.lessons === null) {
+  			this.setState({lessonsExist:false});
+  		} else if(this.state.lessons.length === 0) {
+  			this.setState({lessonsExist:false});
+  		}
   	}
 
 	async logoutUser() {
@@ -74,23 +81,26 @@ export default class ProfileScreen extends React.Component {
 		 
 	}
 
+	checkForLessons = () => {
+
+	}
+
 	render() {
 		return (
 			<SafeAreaView style={styles.container}>
-				<MyHeader openDrawer = {this.props.navigation.toggleDrawer} navigate = {this.props.navigation.navigate} />
+				<Header openDrawer = {this.props.navigation.toggleDrawer} navigate = {this.props.navigation.navigate} />
 				<Image source={Images.Lorensax} style={styles.picture}/>
 				<Text style={styles.title} > {this.state.user.firstName} {this.state.user.lastName} </Text>
 				<Text style={styles.subtitle} > My Lessons </Text>
-				
 				{
 					this.state.loading === true ?
 					<View style={styles.FlatList}>
       					<ActivityIndicator size="large" color="#0000ff" />
       				</View>
       				: 
-						(this.state.lessons.length === 0 || this.state.lessons.length === null) ?
+					(this.state.lessonsExist === false) ?
 						<View style={styles.FlatList} >
-							<Text style={styles.emptyLessons}> You have no current lessons. </Text>
+							<Text style={styles.emptyLessons}> You currently have no lessons. </Text>
 							<Text style={styles.emptyLessons}> Make your first lesson by clicking the button below or by clicking 'Create' in the menu! </Text>
 							<Button onPress={() => this.props.navigation.navigate('Create')} title='Create Your First Lesson!!!' />
 						</View>
@@ -109,7 +119,6 @@ export default class ProfileScreen extends React.Component {
 						    :
 						    <ViewMyLesson {...this.state} />
 				}		
-				
 				<TouchableOpacity onPress={() => this.logoutUser()} >
 					<Text style={styles.subtitle2}> Logout </Text>
 				</TouchableOpacity>

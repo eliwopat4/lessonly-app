@@ -12,6 +12,8 @@ import {
 } from 'react-native';
 import { Metrics, Colors, Images } from '../../Themes';
 import { FontAwesome } from '@expo/vector-icons';
+import StarRating from 'react-native-star-rating';
+import Modal from 'react-native-modal';
 
 export default class ReviewFinishedLesson extends Component {
 
@@ -22,7 +24,20 @@ export default class ReviewFinishedLesson extends Component {
 	    	like: '',
 	    	wish: '',
 	    	wonder: '',
+	    	rating: 0,
+	    	hasRated: false,
+	    	isModalVisible: false,   
 	    }
+  	}
+
+  	componentWillMount() {
+  		this.setState({
+  			like: this.props.like,
+  			wish: this.props.wish,
+  			wonder: this.props.wonder,
+  			rating: this.props.rating,
+  			hasRated: this.props.hasRated,
+  		});
   	}
 
   	setInput = (state, txt) => {
@@ -30,17 +45,70 @@ export default class ReviewFinishedLesson extends Component {
   		this.props.setScreenState(state, txt)
   	}
 
+  	onStarRatingPress = (rating) => {
+  		if(this.state.hasRated === false) {
+  			this.setState({hasRated:true});
+  			this.props.setScreenState('hasRated', true)
+  		}
+  		this.setState({ rating : rating })
+  		this.props.setScreenState('rating', rating)
+  	}
+
+  	clickedRightArrow = () => {
+  		if(this.state.like.length === 0 || this.state.wish.length === 0 || this.state.wonder.length === 0 || this.state.hasRated === false) {
+  			this.setState({ isModalVisible : true })
+  		} else {
+  			this.props.setComponent('YourReview')
+  		}
+  	}
+
+  	toggleModal = () => {
+    	if(this.state.isModalVisible) {
+    		this.setState({ 
+    			isModalVisible: false,
+    		});
+    	} else {
+    		this.setState({ isModalVisible: true });
+    	}
+	}
+
 	render() {
 		return (
 			<View style={styles.container}>
-	      		<Text style={styles.title}> The Derivative Game Review </Text>
+				<Modal
+		          isVisible={this.state.isModalVisible}
+		          animationInTiming={1500}
+		          animationOutTiming={1500}
+		          backdropTransitionInTiming={1500}
+		          backdropTransitionOutTiming={1500}
+		        >
+		        	<View style={styles.modalContent} >
+		        		<Text style={{fontSize: 20, textAlign: 'center'}}> Please completely fill out the review! </Text>
+		      	 		<TouchableOpacity style={styles.button} onPress={() => this.toggleModal()}>
+		  	     			<Text style={{fontSize:20}}> Close </Text> 
+		  	     		</TouchableOpacity>
+		        	</View>
+		        </Modal>
+	      		<Text style={styles.title}> <Text style={{fontWeight: 'bold'}}>The Derivative Game</Text> Review </Text>
 				<Text style={styles.title}> Rating </Text>
-		        <Image source={Images.FiveStarRating} style={{marginLeft: '8.5%'}}/>
+		        <View style={styles.starRating} >
+					<StarRating
+				        disabled={false}
+				        maxStars={5}
+				        emptyStar={'ios-star-outline'}
+				        fullStar={'ios-star'}
+				        halfStar={'ios-star-half'}
+				        iconSet={'Ionicons'}
+				        rating={this.state.rating}
+				        fullStarColor={'darkviolet'}
+				        selectedStar={(rating) => this.onStarRatingPress(rating)}
+				    />
+			    </View>
 		        <Text style={styles.title}>I Like ...</Text>
 		        <TextInput
 		            style={styles.input}
 		            autoCapitalize = 'none'
-		            value={this.props.like}
+		            value={this.state.like}
 			      	multiline={true}
 			      	onChangeText={(txt) => this.setInput('like', txt)} 
 		    	/>
@@ -48,7 +116,7 @@ export default class ReviewFinishedLesson extends Component {
 		        <TextInput
           			style={styles.input}
 		            autoCapitalize = 'none'
-		            value={this.props.wish}
+		            value={this.state.wish}
 			      	multiline={true}
 			      	onChangeText={(txt) => this.setInput('wish', txt)} 
     			/>
@@ -56,7 +124,7 @@ export default class ReviewFinishedLesson extends Component {
 		        <TextInput
           			style={styles.input}
 		            autoCapitalize = 'none'
-		            value={this.props.wonder}
+		            value={this.state.wonder}
 			      	multiline={true}
 			      	onChangeText={(txt) => this.setInput('wonder', txt)} 
     			/>
@@ -67,7 +135,7 @@ export default class ReviewFinishedLesson extends Component {
 	    				</TouchableOpacity>
     				</View>
     				<View style={styles.rightArrow} >
-	    				<TouchableOpacity onPress={() => this.props.setComponent('YourReview')}>
+	    				<TouchableOpacity onPress={() => this.clickedRightArrow()}>
 	    					<FontAwesome name={'arrow-right'} size={ 50 } style={{color: 'black'}} /> 
 	    				</TouchableOpacity>
     				</View>
@@ -83,6 +151,34 @@ const styles = StyleSheet.create({
 		height: '100%',
 		backgroundColor: 'white',
 		alignItems: 'flex-start',
+	},
+	modalContent: {
+	    backgroundColor: 'white',
+	    padding: 22,
+	    justifyContent: 'center',
+	    alignItems: 'center',
+	    borderRadius: 4,
+	    borderColor: 'rgba(0, 0, 0, 0.1)',
+	},
+	button: {
+	    shadowColor: 'gray', 
+	    shadowOffset: { height: 3, width: 3 }, 
+	    shadowOpacity: 3, 
+	    shadowRadius: 3, 
+	  	borderWidth: 1,
+	  	backgroundColor: 'white',
+	    height: 40,
+	    width: 180,
+	    borderRadius: 50,
+	    marginBottom: 20,
+	    justifyContent: 'center',
+	    alignItems: 'center',
+	    flexDirection: 'row',
+	    marginTop: 20,
+	},
+	starRating: {
+		width: '30%',
+		marginLeft: '10%',
 	},
 	title: {
 		width: '80%',

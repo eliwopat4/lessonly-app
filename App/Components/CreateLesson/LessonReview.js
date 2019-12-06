@@ -49,11 +49,6 @@ export default class LessonReview extends Component {
 				errorMessage: 'Please do not leave your lesson name blank',
 				error: true,
 			})
-		} else if (this.state.lessonName.length > 8) {
-			this.setState({
-				errorMessage: 'Please choose a lesson name with 8 or less characters',
-				error: true,
-			})
 		} else {
 			this.setState({ isModalVisible: false });
 			setTimeout(() => {
@@ -83,8 +78,8 @@ export default class LessonReview extends Component {
 			ref: '',
 		}
 		if(type.localeCompare('image') === 0) {
-			console.log(this.props.user+'/'+this.props.media.name)
-			var mediaRef = rootStore.child(this.props.user+'/'+this.props.media.name);
+			console.log(this.props.user.email+'/'+this.props.media.name)
+			var mediaRef = rootStore.child(this.props.user.email+'/'+this.props.media.name);
 
 			// Delete the file
 			mediaRef.delete().then(function() {

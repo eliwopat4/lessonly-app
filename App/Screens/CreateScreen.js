@@ -22,6 +22,8 @@ import LessonSuccess from '../Components/CreateLesson/LessonSuccess';
 import firebase from 'firebase';
 import firestore from '../../firebase'
 
+const usersRef = firestore.collection('users');
+
 export default class CreateScreen extends React.Component {
 
 	constructor(props) {
@@ -39,9 +41,18 @@ export default class CreateScreen extends React.Component {
 	  	}
   	}
 
+
   	async componentWillMount() {
   		var user = await firebase.auth().currentUser;
-  		this.setState({user: user.email})
+  		let userInfo = await usersRef.doc(user.email).get();
+  		// console.log(userInfo.data())
+  		console.log(userInfo.data())
+  		var userPass = {
+  			email: userInfo.data().email,
+  			firstName: userInfo.data().firstName,
+  			lastName: userInfo.data().lastName,
+  		}
+  		this.setState({user: userPass})
   	}
 
   	handleAction = (state, newState, component) => {

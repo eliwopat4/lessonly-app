@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { Metrics, Colors, Images } from '../../Themes';
 import { FontAwesome } from '@expo/vector-icons';
+import Modal from 'react-native-modal';
 
 export default class LessonInstructions extends Component {
 
@@ -21,6 +22,7 @@ export default class LessonInstructions extends Component {
 
 	    this.state = {
 	    	text: '',
+	    	isModalVisible: false,
 	  	}
   	}
 
@@ -34,18 +36,45 @@ export default class LessonInstructions extends Component {
   	}
 
   	rightArrowClicked = () => {
-  		this.props.handleAction('instructions', this.state.text, 'LessonMedia');
+  		if(this.state.text.length === 0) {
+  			this.setState({isModalVisible: true})
+  		} else {
+  			this.props.handleAction('instructions', this.state.text, 'LessonMedia');
+  		}
   	}
 
   	leftArrowClicked = () => {
   		this.props.handleAction('instructions', this.state.text, 'LessonMaterials');
   	}
 
+  	toggleModal = () => {
+    	if(this.state.isModalVisible) {
+    		this.setState({ 
+    			isModalVisible: false,
+    		});
+    	} else {
+    		this.setState({ isModalVisible: true });
+    	}
+	}
 
 	render() {
 		return (
 			<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()} >
 				<View style={styles.container} >
+					<Modal
+			          isVisible={this.state.isModalVisible}
+			          animationInTiming={1500}
+			          animationOutTiming={1500}
+			          backdropTransitionInTiming={1500}
+			          backdropTransitionOutTiming={1500}
+			        >
+			        	<View style={styles.modalContent} >
+			        		<Text style={{fontSize: 20, textAlign: 'center'}}> Please do not leave the instructions for this lesson blank. </Text>
+			      	 		<TouchableOpacity style={styles.button} onPress={() => this.toggleModal()}>
+			  	     			<Text style={{fontSize:20}}> Close </Text> 
+			  	     		</TouchableOpacity>
+			        	</View>
+			        </Modal>
 	      			<Text style={styles.title} > What <Text style={{fontWeight: 'bold'}}>instructions</Text> would give for this lesson? </Text>
 	      			<TextInput
 	          			style={styles.input}
@@ -77,6 +106,30 @@ const styles = StyleSheet.create({
 		width: '100%',
 		height: '100%',
 		alignItems: 'center',	
+	},
+	modalContent: {
+	    backgroundColor: 'white',
+	    padding: 22,
+	    justifyContent: 'center',
+	    alignItems: 'center',
+	    borderRadius: 4,
+	    borderColor: 'rgba(0, 0, 0, 0.1)',
+	},
+	button: {
+	    shadowColor: 'gray', 
+	    shadowOffset: { height: 3, width: 3 }, 
+	    shadowOpacity: 3, 
+	    shadowRadius: 3, 
+	  	borderWidth: 1,
+	  	backgroundColor: 'white',
+	    height: 40,
+	    width: 180,
+	    borderRadius: 50,
+	    marginBottom: 20,
+	    justifyContent: 'center',
+	    alignItems: 'center',
+	    flexDirection: 'row',
+	    marginTop: 20,
 	},
 	title: {
 		width: '80%',

@@ -13,8 +13,9 @@ import {
 import { Metrics, Colors, Images } from '../../Themes';
 import { FontAwesome } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import StarRating from 'react-native-star-rating';
 import firebase from 'firebase';
-import firestore from '../../../firebase'
+import firestore from '../../../firebase';
 
 const collRef = firestore.collection('users');
 const collRef2 = firestore.collection('lessons');
@@ -23,42 +24,72 @@ export default class YourReview extends Component {
 
 	constructor(props) {
 	    super(props);
+
+	    this.state = {
+	    	review: '',
+	    }
   	}
 
-
-  	uploadLesson = async () => {
-  		
-  		var lessons;
+  	uploadReview = async () => {
   		var today = new Date();
 		var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
 		var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
 		var dateTime = date + ',' + time;
-  		var lessonObject = {
-  			objective: this.props.objective,
-  			materials: this.props.materials,
-  			instructions: this.props.instructions,
-  			media: this.props.media,
-  			lessonName: this.props.lessonName,
-  			author: this.props.user,
-  			rating: 'null',
+		var user = {
+			email: this.props.user.email,
+			firstName: this.props.user.firstName,
+			lastName: this.props.user.lastName,
+		}
+  		var reviewObject = {
+  			reviewer: user,
+  			like: this.props.like,
+  			wish: this.props.wish,
+  			wonder: this.props.wonder,
+  			rating: this.props.rating,
   			dateCreated: dateTime,
   		}
-  		let docRef = firestore.doc('users/'+this.props.user);
-		let doc = await docRef.get();
-		// console.log(this.props.user, doc.data());
-	  	if(doc.data().lessons === undefined) {
-	  		lessons = [lessonObject]
-	  	} else if (doc.data().lessons.length === 0) {
-	  		lessons = [lessonObject]
-	  	} else {
-	  		lessons = doc.data().lessons
-	  		lessons.push(lessonObject)
-	  	}
-	  	data = { 
-			lessons: lessons,
-		}
-		let setDoc = collRef.doc(this.props.user).update(data);
-		let setLesson = collRef2.doc(this.props.lessonName).set(lessonObject);
+
+
+  		console.log(reviewObject)
+  		console.log('Current Lesson being reviewed: ' + this.props.lesson.lessonName)
+
+  		
+  		// UPDATE Lesson in Users collection
+  		let userRef = firestore.doc('users/'+this.props.lesson.author.email);
+		let userInfo = await userRef.get();
+		var reviewsCopy = [];
+		var userLessons = userInfo.data().lessons;
+		var userLessonsCopy = [];
+		userLessons.forEach(lesson => {
+
+			if(lesson.lessonName === this.props.lesson.lessonName) {
+				//console.log(lesson);
+				if(lesson.reviews === undefined) {
+			  		lesson.reviews = [reviewObject]
+			  	} else if (lesson.lessons.length === 0) {
+			  		lesson.reviews = [reviewObject]
+			  	} else {
+			  		reviewsCopy = lesson.reviews
+			  		reviewsCopy.push(reviewsCopy)
+			  		lesson.reviews = reviewsCopy;
+			  	}
+			  	//console.log(lesson);
+			}
+
+			userLessonsCopy.append(lesson)
+		});
+		console.log(typeof userLessonsCopy)
+
+		let setDoc = collRef.doc(this.props.lesson.author.email).update(data);
+		let setLesson = collRef2.doc(this.props.lesson.lessonName).set(lessonObject);
+
+
+		// UPDATE Lesson in Lessons collection
+		// let lessonRef = firestore.doc('lessons/'+this.props.lesson.lessonName);
+		// let dbLesson = await lessonRef.get();
+		// console.log('USER DATA: ')
+		// console.log(dbLesson.data())
+
   	}
 
   	submitReview = async () => {
@@ -67,6 +98,7 @@ export default class YourReview extends Component {
 		} catch(error) {
 			console.log(error.message)
 		}
+		//await this.uploadReview()
   		this.props.setComponent('ReviewSubmitted')
   	}
 
@@ -74,8 +106,19 @@ export default class YourReview extends Component {
 		return (
 			<View style={styles.container}>
 				<Text style={styles.title} >Your Review</Text>
-				<Text style={{fontSize: 25, textAlign: 'center', marginBottom:5}}> Rating </Text>
-		        <Image source={Images.FiveStarRating} style={{marginBottom:20}} />
+				<Text style={{fontSize: 25, textAlign: 'center', marginBottom: 10,}}> Rating </Text>
+		        <View style={styles.starRating} >
+					<StarRating
+				        disabled={true}
+				        maxStars={5}
+				        emptyStar={'ios-star-outline'}
+				        fullStar={'ios-star'}
+				        halfStar={'ios-star-half'}
+				        iconSet={'Ionicons'}
+				        rating={this.props.rating}
+				        fullStarColor={'darkviolet'}
+				    />
+			    </View>
 		        <View style={styles.scrollview}>
 	      			<ScrollView > 
 	      				<View style={{alignItems: 'center'}}>
@@ -110,6 +153,9 @@ const styles = StyleSheet.create({
 		height: '100%',
 		backgroundColor: 'white',
 		alignItems: 'center',
+	},
+	starRating: {
+		marginBottom: 10,
 	},
 	title: {
 		width: '80%',
@@ -168,7 +214,7 @@ const styles = StyleSheet.create({
 	},
 	leftArrow: {
 		marginTop: 14,
-		marginRight: 19,
+		marginRight: 20,
 		// borderWidth: 1,
 	},
 	rightArrow: {
@@ -179,7 +225,7 @@ const styles = StyleSheet.create({
 		width: '80%', 
 		height: '50%',
 		padding: 10, 
-		marginBottom: 42,
+		marginBottom: 47,
 		backgroundColor: 'white',
 	  	borderRadius: 10,	
 	  	borderWidth: 1,

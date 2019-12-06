@@ -105,13 +105,15 @@ export default class LessonReview extends Component {
 		this.toggleModal()
 	}
 
-	getUsername() {
-  		var res = (this.props.lesson.author).split("@");
-  		// console.log(res[0]);
-  		return (
-  			<Text style={styles.authorRating}> {res[0]} </Text>
-  		);
-  	}
+	getLessonReviews = () => {
+		if(this.props.lesson.reviews === undefined) {
+			return (<Text style={{marginBottom: 20}}> No reviews currently for this lesson. </Text>);
+		} else if(this.props.lesson.reviews.length === 0) {
+			return (<Text style={{marginBottom: 20}}> No reviews currently for this lesson. </Text>);
+		} else {
+			return (<Text style={{marginBottom: 20}}> {this.props.lesson.reviews} </Text>);
+		}
+	}
 
 	render() {
 		return (
@@ -156,8 +158,8 @@ export default class LessonReview extends Component {
 			        </Modal>
 			    </TouchableWithoutFeedback>
 				<View style={styles.container} >
-	      			<Text style={styles.title} > {this.props.lesson.lessonName} Lesson </Text>
-	      			<Text style={styles.author} > {this.getUsername()} </Text>
+	      			<Text style={styles.title} > Lesson: <Text style={{fontWeight: 'bold'}} >{this.props.lesson.lessonName}</Text> </Text>
+	      			<Text style={styles.author} > Created by: <Text style={{fontWeight: 'bold'}} >{this.props.lesson.author.firstName} {this.props.lesson.author.lastName} </Text> </Text>
 	      			<View style={styles.scrollview}>
 		      			<ScrollView > 
 		      				<Text style={{fontWeight: 'bold'}}> Objective </Text>
@@ -171,6 +173,9 @@ export default class LessonReview extends Component {
 		      				
 		      				<Text style={{fontWeight: 'bold'}}> Media </Text>
 							{this.getDocIcon()}
+
+							<Text style={{fontWeight: 'bold'}}> Reviews </Text>
+							{this.getLessonReviews()}
 		      			</ScrollView>
 	      			</View>
 	    			<View style={styles.arrowContainer} >

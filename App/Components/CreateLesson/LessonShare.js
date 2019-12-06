@@ -39,6 +39,13 @@ export default class LessonShare extends Component {
 
   	uploadLesson = async () => {
   		var lessons;
+  		//console.log(this.props.user.firstName)
+  		//console.log(this.props.user.lastName)
+  		var user = {
+  			email: this.props.user.email,
+  			firstName: this.props.user.firstName,
+  			lastName: this.props.user.lastName,
+  		};
   		var today = new Date();
 		var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
 		var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
@@ -49,13 +56,14 @@ export default class LessonShare extends Component {
   			instructions: this.props.instructions,
   			media: this.props.media,
   			lessonName: this.props.lessonName,
-  			author: this.props.user,
+  			author: user,
   			rating: 'null',
   			dateCreated: dateTime,
   		}
-  		let docRef = firestore.doc('users/'+this.props.user);
+  		//console.log('users/'+this.props.user.email)
+  		let docRef = firestore.doc('users/'+this.props.user.email);
 		let doc = await docRef.get();
-		// console.log(this.props.user, doc.data());
+		console.log(doc.data());
 	  	if(doc.data().lessons === undefined) {
 	  		lessons = [lessonObject]
 	  	} else if (doc.data().lessons.length === 0) {
@@ -64,10 +72,14 @@ export default class LessonShare extends Component {
 	  		lessons = doc.data().lessons
 	  		lessons.push(lessonObject)
 	  	}
-	  	data = { 
+	  	var data = { 
 			lessons: lessons,
 		}
-		let setDoc = collRef.doc(this.props.user).update(data);
+		//console.log(data)
+		//let setDoc = collRef.doc(this.props.user.email).update(data);
+
+		let testRef = firestore.collection('users/'+this.props.user.email+'/lessons').doc(lessonObject.lessonName);
+		let test = testRef.set(lessonObject);
 		let setLesson = collRef2.doc(this.props.lessonName).set(lessonObject);
   	}
 

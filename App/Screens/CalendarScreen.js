@@ -20,6 +20,10 @@ import YourReview from '../Components/ReviewLesson/YourReview';
 import ReviewSubmitted from '../Components/ReviewLesson/ReviewSubmitted';
 import CalendarPicker from 'react-native-calendar-picker';
 import { FontAwesome } from '@expo/vector-icons';
+import firebase from 'firebase';
+import firestore from '../../firebase';
+
+const usersRef = firestore.collection('users');
 
 export default class CalendarScreen extends React.Component {
 
@@ -31,7 +35,19 @@ export default class CalendarScreen extends React.Component {
 	    	like: '',
 	    	wish: '',
 	    	wonder: '',
+	    	rating: 0,
+	    	hasRated: false,
+	    	datePicked: '',
+	    	lesson: '',
+	    	user: '',
 	    }
+  	}
+
+  	async componentDidMount() {
+  		var user = await firebase.auth().currentUser;
+  		let userInfo = await usersRef.doc(user.email).get();
+  		// console.log(userInfo.data())
+  		this.setState({user: userInfo.data()})
   	}
 
   	setScreenState = (state, txt) => {
@@ -55,19 +71,20 @@ export default class CalendarScreen extends React.Component {
   	getComponent() {
   		switch(this.state.currComponent) {
 		  	case 'DefaultCalendar':
-		  		return (<DefaultCalendar setComponent = {this.setComponent} />);
+		  		return (<DefaultCalendar setScreenState = {this.setScreenState} setComponent = {this.setComponent} />);
 		    	break;
 		  	case 'TodaysLesson':
-		  		return (<TodaysLesson setComponent = {this.setComponent} />);
+		  		return (<TodaysLesson {...this.state} setScreenState = {this.setScreenState} setComponent = {this.setComponent} />);
 		    	break;
 		    case 'CompletedLesson':
 		  		return (<CompletedLesson setComponent = {this.setComponent} />);
 		    	break;
 		    case 'AskToReview':
-		  		return (<AskToReview setComponent = {this.setComponent} navigate = {this.props.navigation.navigate} />);
+		    	//console.log(this.state.lesson)
+		  		return (<AskToReview {...this.state} setComponent = {this.setComponent} navigate = {this.props.navigation.navigate} />);
 		    	break;	
 		    case 'ReviewFinishedLesson':
-		  		return (<ReviewFinishedLesson setComponent = {this.setComponent}  setScreenState = {this.setScreenState}/>);
+		  		return (<ReviewFinishedLesson {...this.state} setComponent = {this.setComponent}  setScreenState = {this.setScreenState}/>);
 		    	break;
 		    case 'YourReview':
 		  		return (<YourReview {...this.state} setComponent = {this.setComponent}/>);
