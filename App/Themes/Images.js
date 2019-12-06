@@ -9,6 +9,9 @@ const images = {
 	LessonlyText: require('../Images/lessonlyText.png'),
 	Lorensax: require('../Images/lorensax.png'),
 	Rating: require('../Images/rating.png'),
+	Norbury: require('../Images/norbury.png'),
+	MeanGirls: require('../Images/meanGirls.png'),
+	FiveStarRating: require('../Images/5-star-rating.png'),
 }
 
 export default images

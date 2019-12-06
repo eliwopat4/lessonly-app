@@ -40,16 +40,7 @@ export default class CreateScreen extends React.Component {
   	}
 
   	async componentWillMount() {
-  		console.log('called will mount')
-  		//console.log(this.state.currComponent)
-  		console.log(this.props.getParam())
-  		if(this.state.currComponent.localeCompare('LessonObjectives') !== 0) {
-  			this.setState({currComponent: 'LessonObjectives'})
-  		}
   		var user = await firebase.auth().currentUser;
-  		// console.log('printing props...')
-  		// console.log(this.props.navigation)
-  		// console.log(this.props.screenProps)
   		this.setState({user: user.email})
   	}
 

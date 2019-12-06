@@ -6,11 +6,10 @@ import {
 	TouchableWithoutFeedback,
 	View,
 } from 'react-native';
-import { Metrics, Colors, Images } from '../Themes';
 
 const colors = [['royalblue', 'fuchsia', 'darkviolet'], ['darkviolet', 'royalblue', 'fuchsia'], ['fuchsia', 'darkviolet', 'royalblue']];
 
-export default class SearchResults extends Component {
+export default class MySearchResults extends Component {
 
 	constructor(props) {
 	    super(props);
@@ -18,16 +17,7 @@ export default class SearchResults extends Component {
   	}
 
   	clickedLesson = () => {
-  		// console.log(this.props.lessonObject)
-  		this.props.handleAction('lesson', this.props.lessonObject, 'LessonOverview')
-  	}
-
-  	getUsername() {
-  		var res = (this.props.lessonObject.author).split("@");
-  		// console.log(res[0]);
-  		return (
-  			<Text style={styles.authorRating}> {res[0]} </Text>
-  		);
+  		 console.log('clicked lesson')
   	}
 
 	render() {
@@ -54,7 +44,6 @@ export default class SearchResults extends Component {
 						onPress={() => this.clickedLesson()} >
 						    <Text style={styles.groupName}> {this.props.lessonObject.lessonName} </Text>
 					</TouchableOpacity>
-					{this.getUsername()}
 				</View>
 			</TouchableWithoutFeedback>
 		);

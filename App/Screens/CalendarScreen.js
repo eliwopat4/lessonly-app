@@ -11,6 +11,13 @@ import {
 } from 'react-native';
 import { Metrics, Colors, Images } from '../Themes';
 import Header from '../Components/Header';
+import TodaysLesson from '../Components/ReviewLesson/TodaysLesson';
+import DefaultCalendar from '../Components/ReviewLesson/DefaultCalendar';
+import CompletedLesson from '../Components/ReviewLesson/CompletedLesson';
+import AskToReview from '../Components/ReviewLesson/AskToReview';
+import ReviewFinishedLesson from '../Components/ReviewLesson/ReviewFinishedLesson';
+import YourReview from '../Components/ReviewLesson/YourReview';
+import ReviewSubmitted from '../Components/ReviewLesson/ReviewSubmitted';
 import CalendarPicker from 'react-native-calendar-picker';
 import { FontAwesome } from '@expo/vector-icons';
 
@@ -18,31 +25,64 @@ export default class CalendarScreen extends React.Component {
 
 	constructor(props) {
 	    super(props);
+
+	    this.state = {
+	    	currComponent: 'DefaultCalendar',
+	    	like: '',
+	    	wish: '',
+	    	wonder: '',
+	    }
+  	}
+
+  	setScreenState = (state, txt) => {
+  		this.setState({ [state] : txt })
+  	}
+
+  	getScreenState = (passedState) => {
+  		if(passedState.localeCompare('like') === 0) {
+  			return this.state.like;
+  		} else if(passedState.localeCompare('wish') === 0) {
+  			return this.state.wish;
+  		} else if(passedState.localeCompare('wonder') === 0) {
+  			return this.state.wonder;
+  		}
+  	}
+
+  	setComponent = (newComponent) => {
+  		this.setState({ currComponent: newComponent})
+  	}
+
+  	getComponent() {
+  		switch(this.state.currComponent) {
+		  	case 'DefaultCalendar':
+		  		return (<DefaultCalendar setComponent = {this.setComponent} />);
+		    	break;
+		  	case 'TodaysLesson':
+		  		return (<TodaysLesson setComponent = {this.setComponent} />);
+		    	break;
+		    case 'CompletedLesson':
+		  		return (<CompletedLesson setComponent = {this.setComponent} />);
+		    	break;
+		    case 'AskToReview':
+		  		return (<AskToReview setComponent = {this.setComponent} navigate = {this.props.navigation.navigate} />);
+		    	break;	
+		    case 'ReviewFinishedLesson':
+		  		return (<ReviewFinishedLesson setComponent = {this.setComponent}  setScreenState = {this.setScreenState}/>);
+		    	break;
+		    case 'YourReview':
+		  		return (<YourReview {...this.state} setComponent = {this.setComponent}/>);
+		    	break;	
+		    case 'ReviewSubmitted':
+		  		return (<ReviewSubmitted setComponent = {this.setComponent} navigate = {this.props.navigation.navigate} />);
+		    	break;	
+		}
   	}
 
 	render() {
 		return (
 			<SafeAreaView style={styles.container}>
-				<Header openDrawer = {this.props.navigation.toggleDrawer} navigate = {this.props.navigation.navigate} />
-				<Text style={styles.title} ><Text style={{fontWeight: 'bold'}}>Add</Text> this lesson to your course calendar</Text>
-				<CalendarPicker
-					style = {styles.calendar}
-					selectedDayColor = {Colors.lg1}
-					todayTextStyle = {{color: Colors.lg1}}
-					todayBackgroundColor = {'transparent'}
-				/>
-				<View style={styles.arrowContainer} >
-    				<View style={styles.leftArrow} >
-	    				<TouchableOpacity > 
-	    					<FontAwesome name={'arrow-left'} size={ 50 } style={{color: 'black'}} /> 
-	    				</TouchableOpacity>
-    				</View>
-    				<View style={styles.rightArrow} >
-	    				<TouchableOpacity >
-	    					<FontAwesome name={'arrow-right'} size={ 50 } style={{color: 'black'}} /> 
-	    				</TouchableOpacity>
-    				</View>
-    			</View>
+				<Header openDrawer = {this.props.navigation.openDrawer} navigate = {this.props.navigation.navigate} />
+				{this.getComponent()}
 			</SafeAreaView>
 			
 		);

@@ -6,11 +6,18 @@ import {
 	Image,
 	TouchableOpacity,
 	Button,
+	FlatList,
+	View,
+	ActivityIndicator,
 } from 'react-native';
 import { Metrics, Colors, Images } from '../Themes';
 import firebase from 'firebase';
 import firestore from '../../firebase'
-import Header from '../Components/Header';
+import MyHeader from '../Components/MyHeader';
+import MySearchResults from '../Components/MySearchResults';
+import ViewMyLesson from '../Components/ViewMyLesson';
+
+const usersRef = firestore.collection('lessons');
 
 export default class ProfileScreen extends React.Component {
 
@@ -18,19 +25,29 @@ export default class ProfileScreen extends React.Component {
 	    super(props);
 
 	    this.state = {
-	    	
+	    	user: '',
+	    	lessons: [],
+	    	loading: true,
+	    	viewLesson: false,
 	  	}
   	}
 
-
-	showCurrentUser() {
-		if (firebase.auth().currentUser !== null) {
-			alert('Current user is: ' + firebase.auth().currentUser.email);
-		} else {
-			alert('No user is currently logged in. Error in source code.');
+  	async componentDidMount() {
+  		var user;
+  		try {
+			user = await firebase.auth().currentUser
+		} catch(error) {
+			console.log(error.message)
 		}
-	}
-
+  		var userRef = firestore.doc('users/'+user.email)
+  		let doc = await userRef.get()
+  		this.setState({ 
+  			user: doc.data(),
+  			lessons: doc.data().lessons,
+  			loading: false,
+  		});
+  		// console.log(this.state.lessons)
+  	}
 
 	async logoutUser() {
 		await firebase.auth().signOut();
@@ -38,24 +55,63 @@ export default class ProfileScreen extends React.Component {
 		this.props.navigation.navigate('Loading');
 	}
 
-  	componentDidMount() {
-  		var screen = this.props.navigation.getParam('screenA', 'null');
-  		this.props.navigation.setParams({ 
-  			screenA: this.props.navigation.state.routeName,
-  			screenB: screen,
-  		});
-  	}
+	getColRow = (index) => {
+		var col;
+		var row;
+		if(index % 3 === 0) {
+			col = 0;
+		} else if(index % 3 === 1) {
+			col = 1;
+		} else {
+			col = 2;
+		}
+		if(index === 0){
+			row = 0;
+		} else {
+			row = Math.floor(index/3) % 3;
+		}
+		return {row, col};
+		 
+	}
 
 	render() {
 		return (
 			<SafeAreaView style={styles.container}>
-				<Header openDrawer = {this.props.navigation.toggleDrawer} navigate = {this.props.navigation.navigate} />
-				<Text style={styles.title} > Profile </Text>
-				<TouchableOpacity onPress={() => this.showCurrentUser()} >
-					<Text style={styles.title2} > Check User </Text>
-				</TouchableOpacity>
+				<MyHeader openDrawer = {this.props.navigation.toggleDrawer} navigate = {this.props.navigation.navigate} />
+				<Image source={Images.Lorensax} style={styles.picture}/>
+				<Text style={styles.title} > {this.state.user.firstName} {this.state.user.lastName} </Text>
+				<Text style={styles.subtitle} > My Lessons </Text>
+				
+				{
+					this.state.loading === true ?
+					<View style={styles.FlatList}>
+      					<ActivityIndicator size="large" color="#0000ff" />
+      				</View>
+      				: 
+						(this.state.lessons.length === 0 || this.state.lessons.length === null) ?
+						<View style={styles.FlatList} >
+							<Text style={styles.emptyLessons}> You have no current lessons. </Text>
+							<Text style={styles.emptyLessons}> Make your first lesson by clicking the button below or by clicking 'Create' in the menu! </Text>
+							<Button onPress={() => this.props.navigation.navigate('Create')} title='Create Your First Lesson!!!' />
+						</View>
+						:
+							this.state.viewLesson === false ?
+							<View style={styles.FlatList} >
+								<FlatList	
+						          	data={this.state.lessons}
+									numColumns={3}
+						          	renderItem={({ item, index }) => (
+						          		<MySearchResults lessonObject = {item} columnRow = {this.getColRow(index)} />
+						          	)}
+						          	keyExtractor={item => item.dateCreated} 
+						        />
+						    </View>
+						    :
+						    <ViewMyLesson {...this.state} />
+				}		
+				
 				<TouchableOpacity onPress={() => this.logoutUser()} >
-					<Text style={styles.title2}> Logout </Text>
+					<Text style={styles.subtitle2}> Logout </Text>
 				</TouchableOpacity>
 			</SafeAreaView>
 		)
@@ -64,20 +120,46 @@ export default class ProfileScreen extends React.Component {
 
 const styles = StyleSheet.create({
 	container: {
-		flex: 1,
+		height: '100%', 
+		width: '100%',
 		backgroundColor: 'white',
 		alignItems: 'center',
 	},
+	picture: {
+		marginTop: 30,
+		marginBottom: 20,
+		height: 100,
+		width: 100,
+		resizeMode: 'contain',
+	},
 	title: {
+		fontSize: 25,
+		fontWeight: 'bold',
+	},
+	subtitle: {
+		marginTop: 30,
+		marginBottom: 30,
 		fontSize: 20,
 		fontWeight: 'bold',
 	},
-	title2: {
-		marginTop: 50,
+	subtitle2: {
+		marginTop: 30,
+		marginBottom: 30,
 		fontSize: 20,
 		fontWeight: 'bold',
+		color: 'red'
 	},
-	temp: {
-		marginBottom: 100,
+	emptyLessons: {
+		fontSize: 20,
+		fontWeight: 'bold',
+		textAlign: 'center',
+		paddingLeft: 30,
+		paddingRight: 30
+	},
+	FlatList: {
+		height: '50%',
+		width: '100%',
+		alignItems: 'center',
 	}
+	
 })

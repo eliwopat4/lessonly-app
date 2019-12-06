@@ -13,12 +13,11 @@ import {
 	TouchableWithoutFeedback,
 	Keyboard,
 } from 'react-native';
-import { Metrics, Colors, Images } from '../Themes';
+import { Metrics, Colors, Images } from '../../Themes';
 import { SearchBar } from 'react-native-elements'
-import Header from './Header';
 import SearchResults from './SearchResults';
 import firebase from 'firebase';
-import firestore from '../../firebase'
+import firestore from '../../../firebase'
 
 const usersRef = firestore.collection('lessons');
 

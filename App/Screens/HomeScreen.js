@@ -16,10 +16,11 @@ import {
 import { Metrics, Colors, Images } from '../Themes';
 import { SearchBar } from 'react-native-elements'
 import Header from '../Components/Header';
-import DefaultSearch from '../Components/DefaultSearch';
-import SearchLessons from '../Components/SearchLessons';
-import LessonOverview from '../Components/LessonOverview';
-import Calendar from '../Components/Calendar';
+import DefaultSearch from '../Components/SearchFunction/DefaultSearch';
+import SearchLessons from '../Components/SearchFunction/SearchLessons';
+import LessonOverview from '../Components/SearchFunction/LessonOverview';
+import Calendar from '../Components/SearchFunction/Calendar';
+import LessonAddSuccess from '../Components/SearchFunction/LessonAddSuccess';
 import firebase from 'firebase';
 import firestore from '../../firebase'
 
@@ -50,6 +51,7 @@ export default class HomeScreen extends React.Component {
 		    	lessons: [],
 		    	currComponent: 'DefaultSearch',
 		    	lesson: '',
+		    	datePicked: '',
   			})
   		} else if (component.localeCompare(this.state.currComponent) === 0) {
   			console.log('updating '+state+'...');
@@ -73,18 +75,15 @@ export default class HomeScreen extends React.Component {
 		    case 'LessonOverview':
 		  		return (<LessonOverview {...this.state} handleAction = {this.handleAction} navigate = {this.props.navigation.navigate}/>);
 		    	break;
-		     case 'Calendar':
+		    case 'Calendar':
 		  		return (<Calendar {...this.state} handleAction = {this.handleAction} navigate = {this.props.navigation.navigate}/>);
+		    	break;
+		    case 'LessonAddSuccess':
+		  		return (<LessonAddSuccess {...this.state} handleAction = {this.handleAction} navigate = {this.props.navigation.navigate}/>);
 		    	break;
 		}
   	}
 
-  	printStates = () => {
-  		console.log(this.state.search);
-  		// console.log(this.state.lessons);
-  		// console.log(this.state.data);
-  		console.log(this.state.currComponent);
-  	}
 
   	navigate = (screen) => {
   		this.props.screenProps = 'LessonObjectives';
@@ -93,7 +92,6 @@ export default class HomeScreen extends React.Component {
 
 	render() {
 		return (
-
 			<SafeAreaView style={styles.container}>
 				<Header openDrawer = {this.props.navigation.toggleDrawer} navigate = {this.navigate}/>
 				{this.getComponent()}

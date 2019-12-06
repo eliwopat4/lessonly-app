@@ -9,49 +9,51 @@ import {
 	Button,
 	View,
 } from 'react-native';
-import { Metrics, Colors, Images } from '../Themes';
-import Header from '../Components/Header';
+import { Metrics, Colors, Images } from '../../Themes';
 import CalendarPicker from 'react-native-calendar-picker';
 import { FontAwesome } from '@expo/vector-icons';
 
-export default class Calendar extends React.Component {
+export default class DefaultCalendar extends React.Component {
 
 	constructor(props) {
 	    super(props);
   	}
 
+  	onDateChange = () => {
+  		this.props.setComponent('TodaysLesson')
+  	}
+
 	render() {
 		return (
 			<View style={styles.container}>
-				<Text style={styles.title} ><Text style={{fontWeight: 'bold'}}>Add</Text> this lesson to your course calendar</Text>
+				<Text style={styles.title} >Check your<Text style={{fontWeight: 'bold'}}> lesson calendar</Text></Text>
 				<CalendarPicker
 					style = {styles.calendar}
 					selectedDayColor = {Colors.lg1}
 					todayTextStyle = {{color: Colors.lg1}}
 					todayBackgroundColor = {'transparent'}
+					onDateChange={this.onDateChange}
 				/>
 				<View style={styles.arrowContainer} >
     				<View style={styles.leftArrow} >
 	    				<TouchableOpacity > 
-	    					<FontAwesome name={'arrow-left'} size={ 50 } style={{color: 'black'}} /> 
+	    					<FontAwesome name={'arrow-left'} size={ 50 } style={{color: 'white'}} /> 
 	    				</TouchableOpacity>
     				</View>
     				<View style={styles.rightArrow} >
 	    				<TouchableOpacity >
-	    					<FontAwesome name={'arrow-right'} size={ 50 } style={{color: 'black'}} /> 
+	    					<FontAwesome name={'arrow-right'} size={ 50 } style={{color: 'white'}} /> 
 	    				</TouchableOpacity>
     				</View>
     			</View>
 			</View>
-			
 		);
 	}
 }
 
 const styles = StyleSheet.create({
 	container: {
-		height: '100%',
-		width: '100%',
+		flex: 1,
 		backgroundColor: 'white',
 		alignItems: 'center',
 	},

@@ -12,16 +12,11 @@ import {
 	TouchableWithoutFeedback,
 	Keyboard,
 } from 'react-native';
-import { Metrics, Colors, Images } from '../Themes';
 import { FontAwesome } from '@expo/vector-icons';
-import firebase from 'firebase';
 import Modal from 'react-native-modal';
-import firestore from '../../firebase'
 
-const rootStore = firebase.storage().ref();
-const collRef = firestore.collection('users');
 
-export default class LessonReview extends Component {
+export default class ViewMyLesson extends Component {
 
 	constructor(props) {
 	    super(props);
@@ -61,7 +56,7 @@ export default class LessonReview extends Component {
 
 
 	getDocIcon = () => {
-		console.log(this.props.lesson.media)
+		//console.log(this.props.lesson.media)
 		switch(this.props.lesson.media.type) {
 		  	case 'none':
 		  		return (<Text style={{marginBottom: 20}}> None </Text>);
@@ -120,7 +115,7 @@ export default class LessonReview extends Component {
 
 	render() {
 		return (
-			<View>
+			<View style={styles.container}>
 				<TouchableWithoutFeedback onPress={() => this.toggleModal} >
 					<Modal
 			          	isVisible={this.state.isModalVisible}
@@ -130,6 +125,11 @@ export default class LessonReview extends Component {
 			          	backdropTransitionOutTiming={1500}
 			        >
 			        	<View style={styles.modalContent} >
+			        		<View style={{flexDirection: 'row-reverse', width: 300}}>
+								<TouchableOpacity onPress={() => this.toggleModal()}>
+									<FontAwesome name={'times-circle'} size={ 30 } style={{color: 'red'}} /> 
+								</TouchableOpacity>
+							</View>
 			        		<View style={styles.mediaIcons}>
 			    				<View style={styles.iconRow}>
 					    			<TouchableOpacity style={styles.icon} onPress={() => this.toggleModal()}> 
@@ -152,12 +152,6 @@ export default class LessonReview extends Component {
 									</TouchableOpacity>
 								</View>
 							</View>
-							<View style={{flexDirection: 'row-reverse', width: 300, marginBottom: 10}}>
-								<TouchableOpacity onPress={() => this.toggleModal()}>
-									<FontAwesome name={'times-circle'} size={ 30 } style={{color: 'red'}} /> 
-								</TouchableOpacity>
-							</View>
-
 			        	</View>
 			        </Modal>
 			    </TouchableWithoutFeedback>
@@ -296,7 +290,7 @@ const styles = StyleSheet.create({
 		padding: 10, 
 	  	flexDirection: 'row',
 	  	marginBottom: 12,
-	  	marginTop: 30,
+	  	marginTop: 15,
 		justifyContent: 'space-around',
 	},
 	iconRow: {
