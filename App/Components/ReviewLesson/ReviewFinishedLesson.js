@@ -89,7 +89,7 @@ export default class ReviewFinishedLesson extends Component {
 		  	     		</TouchableOpacity>
 		        	</View>
 		        </Modal>
-	      		<Text style={styles.title}> <Text style={{fontWeight: 'bold'}}>The Derivative Game</Text> Review </Text>
+	      		<Text style={styles.title}> <Text style={{fontWeight: 'bold'}}>{this.props.lesson.lessonName}</Text> Lesson Review </Text>
 				<Text style={styles.title}> Rating </Text>
 		        <View style={styles.starRating} >
 					<StarRating

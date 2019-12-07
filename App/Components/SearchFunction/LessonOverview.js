@@ -18,7 +18,7 @@ import firebase from 'firebase';
 import firestore from '../../../firebase';
 import StarRating from 'react-native-star-rating';
 
-const usersRef = firestore.collection('lessons');
+const lessonsRef = firestore.collection('lessons');
 
 
 export default class LessonReview extends Component {
@@ -31,10 +31,69 @@ export default class LessonReview extends Component {
 	    	error: false,
 	    	errorMessage: '',
 	    	lessonName: '',
+	    	lesson: '',
+	    	loading: true,
 	    	reviews: [],
+	    	reviewsShow: false,
 	  	}
   	}
 
+
+	async componentWillMount() {
+		console.log('mounting...')
+		let docs = await lessonsRef.get();
+		let lessonsCopy = [];
+		docs.forEach((doc) => {
+			// console.log(doc.data())
+			lesson = {
+				lessonName: doc.data().lessonName,
+				objective: doc.data().objective,
+	  			materials: doc.data().materials,
+	  			instructions: doc.data().instructions,
+	  			media: doc.data().media,
+	  			author: doc.data().author,
+	  			rating: 'null',
+	  			dateCreated: doc.data().dateCreated,
+			}
+			lessonsCopy.push(lesson)
+		});	
+		var array_length = (lessonsCopy.length-1)
+		var index = Math.floor((Math.random() * array_length));
+		// this.props.setScreenState('lesson', lessonsCopy[index])
+		// this.setState({lesson:lessonsCopy[index], loading: false})
+
+		docs = await firestore.collection('lessons/'+this.props.lesson.lessonName+'/reviews').get();
+		let reviews = [];
+		docs.forEach((doc) => {
+			//console.log(doc.data())
+			reviews.push(doc.data())
+		});	
+
+		if(reviews !== undefined) {
+			console.log('here')
+			this.setState({ 
+				lesson:lessonsCopy[index],
+				reviews : reviews,
+				reviewsShow: true,
+				loading: false,
+			});
+		} else if(reviews.length !== 0) {
+			console.log('here2')
+			this.setState({ 
+				lesson:lessonsCopy[index],
+				reviews : reviews,
+				reviewsShow: true,
+				loading: false,
+			});
+		} else {
+			console.log('here3')
+			this.setState({ 
+				lesson:lessonsCopy[index],
+				reviews : reviews,
+				loading: false,
+			});
+		}
+	}
 
   	leftArrowClicked = () => {
   		this.props.handleAction('cleanUp');
@@ -61,99 +120,11 @@ export default class LessonReview extends Component {
 	}
 
 
-	getDocIcon = () => {
-		//console.log(this.props.lesson.media)
-		switch(this.props.lesson.media.type) {
-		  	case 'none':
-		  		return (<Text style={{marginBottom: 20}}> None </Text>);
-		    	break;
-		    case undefined:
-		  		return (<Text style={{marginBottom: 20}}> None </Text>);
-		    	break;
-		    case 'image':
-		    	return (
-		    		<View style={{alignItems: 'center'}}> 
-			    		<Image
-					  		source={{uri: this.props.lesson.media.ref}}
-					  		style={styles.mediaPicture}
-						/>
-		    		</View>
-		    	);
-		    	break; 
-		    case 'video':
-		    	return (
-		    		<View style={{alignItems: 'center'}}>
-			    		<FontAwesome name={'play-circle'} size={ 75 } style={{color: 'black'}} />
-		    		</View>
-		    	);
-		    	break; 
-		    case 'music':
-		    	return (
-		    		<View style={{alignItems: 'center'}}>
-			    		<FontAwesome name={'music'} size={ 75 } style={{color: 'black'}} />
-		    		</View>
-		    		);
-		    	break; 
-		    case 'document':
-		    	return (
-		    		<View style={{alignItems: 'center'}}>
-			    		<FontAwesome name={'paperclip'} size={ 75 } style={{color: 'black'}} />
-		    		</View>
-		    		);
-		    	break; 
-		  	default:
-		    	return (<Text style={{marginBottom: 20}}> Error </Text>);
-		}
-	}
+
 
 	goToCalendar = () => {
 		this.props.handleAction('search', '', 'Calendar')
 		this.toggleModal()
-	}
-
-	getLessonReviews = async () => {
-		let docs = await firestore.collection('lessons/'+this.props.lesson.lessonName+'/reviews').get();
-		let reviews = [];
-		docs.forEach((doc) => {
-			//console.log(doc.data())
-			reviews.push(doc.data())
-		});	
-		this.setState({ reviews : reviews });
-		//return reviews;
-	}
-
-	returnLessonReviews = () => {
-		this.getLessonReviews()
-		//console.log(this.state.reviews)
-
-		if(this.state.reviews === undefined) {
-			return (<Text style={{marginBottom: 20}}> No reviews currently for this lesson. </Text>);
-		} else if(this.state.reviews.length === 0) {
-			return (<Text style={{marginBottom: 20}}> No reviews currently for this lesson. </Text>);
-		} else {
-			return this.state.reviews.map((review, index) => {
-				return (
-					<View key={index}>
-						<View style={styles.starRating} >
-							<StarRating
-						        disabled={false}
-						        maxStars={5}
-						        emptyStar={'ios-star-outline'}
-						        fullStar={'ios-star'}
-						        halfStar={'ios-star-half'}
-						        iconSet={'Ionicons'}
-						        rating={review.rating}
-						        fullStarColor={'darkviolet'}
-						    />
-					    </View>
-					    <Text > {review.like} </Text>
-					    <Text > {review.wish} </Text>
-					    <Text style={{marginBottom: 20}}> {review.wonder} </Text>
-					</View>
-				);
-			});
-
-		}
 	}
 
 	render() {
@@ -213,10 +184,65 @@ export default class LessonReview extends Component {
 		      				<Text style={{marginBottom: 20}}> {this.props.lesson.instructions} </Text>
 		      				
 		      				<Text style={{fontWeight: 'bold'}}> Media </Text>
-							{this.getDocIcon()}
+							{
+							  	(this.props.lesson.media.type === 'none') ?
+							  			<Text style={{marginBottom: 20}}> None </Text>
+							  	:
+							    (this.props.lesson.media.type === 'undefined') ?
+							  		<Text style={{marginBottom: 20}}> None </Text>
+							  	:
+							    (this.props.lesson.media.type === 'image') ?
+					    			<Image
+								  		source={{uri: this.props.lesson.media.ref}}
+								  		style={styles.mediaPicture}
+									/>
+						    	:
+						    	(this.props.lesson.media.type === 'video') ?
+						    		<View style={{alignItems: 'center'}}>
+							    		<FontAwesome name={'play-circle'} size={ 75 } style={{color: 'black'}} />
+						    		</View>
+						    	:
+		    					(this.props.lesson.media.type === 'music') ?
+						    		<View style={{alignItems: 'center'}}>
+							    		<FontAwesome name={'music'} size={ 75 } style={{color: 'black'}} />
+						    		</View>
+ 								:
+							    (this.props.lesson.media.type === 'document') ?
+						    		<View style={{alignItems: 'center'}}>
+							    		<FontAwesome name={'paperclip'} size={ 75 } style={{color: 'black'}} />
+						    		</View>
+						    	:
+						    	null
+							}
 
 							<Text style={{fontWeight: 'bold'}}> Reviews </Text>
-							{this.returnLessonReviews()}
+							{	
+								this.state.reviewsShow ?
+									this.state.reviews.map((review, index) => {
+										return(
+											<View key={index}>
+												<View style={styles.starRating} >
+													<StarRating
+												        disabled={true}
+												        maxStars={5}
+												        emptyStar={'ios-star-outline'}
+												        fullStar={'ios-star'}
+												        halfStar={'ios-star-half'}
+												        iconSet={'Ionicons'}
+												        rating={review.rating}
+												        fullStarColor={'darkviolet'}
+												    />
+											    </View>
+											    <Text > I like: {review.like} </Text>
+											    <Text > I wish: {review.wish} </Text>
+											    <Text > I wonder: {review.wonder} </Text>
+											    <Text style={{marginBottom: 20}}> By: {review.reviewer.firstName} {review.reviewer.lastName}</Text>
+											</View>
+										)
+									})
+								:
+								<Text style={{marginBottom: 20}}> No reviews currently for this lesson. </Text>
+							}
 		      			</ScrollView>
 	      			</View>
 	    			<View style={styles.arrowContainer} >

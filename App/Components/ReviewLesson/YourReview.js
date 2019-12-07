@@ -74,7 +74,7 @@ export default class YourReview extends Component {
 	render() {
 		return (
 			<View style={styles.container}>
-				<Text style={styles.title} >Your Review</Text>
+				<Text style={styles.title} >Your Lesson Review of <Text style={{fontWeight: 'bold'}} >{this.props.lesson.lessonName} </Text> </Text>
 				<Text style={{fontSize: 25, textAlign: 'center', marginBottom: 10,}}> Rating </Text>
 		        <View style={styles.starRating} >
 					<StarRating
@@ -91,7 +91,6 @@ export default class YourReview extends Component {
 		        <View style={styles.scrollview}>
 	      			<ScrollView > 
 	      				<View style={{alignItems: 'center'}}>
-	      					<Text style={styles.body}> The Derivative Game </Text>
 	      					<Image source={Images.Stars} style={{marginBottom: '5%',}}/>
 	      				</View>
 	      				<Text style={styles.body}>I like... <Text style={styles.bodyBold}> {this.props.like} </Text></Text>

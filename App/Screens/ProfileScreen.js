@@ -41,10 +41,18 @@ export default class ProfileScreen extends React.Component {
 			console.log(error.message)
 		}
   		var userRef = firestore.doc('users/'+user.email)
-  		let doc = await userRef.get()
+  		let userInfo = await userRef.get()
+  		var lessonsRef = firestore.collection('users/'+user.email+'/lessons')
+  		var lessons = await lessonsRef.get();
+		// console.log(userInfo.data())
+		var lessonsArray = [];
+		lessons.forEach((lesson) => {
+			// console.log(lesson.data())
+			lessonsArray.push(lesson.data())
+		});
   		this.setState({ 
-  			user: doc.data(),
-  			lessons: doc.data().lessons,
+  			user: userInfo.data(),
+  			lessons: lessonsArray,
   			loading: false,
   		});
   		if(this.state.lessons === undefined) {

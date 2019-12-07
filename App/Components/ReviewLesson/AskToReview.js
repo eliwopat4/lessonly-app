@@ -23,7 +23,11 @@ export default class AskToReview extends Component {
 	    super(props);
 
 	    this.state ={
-	    	lesson: ''
+	    	lesson: '',
+	    	loading: true,
+	    	reviews: [],
+	    	reviewsShow: false,
+
 	    }
   	}
 
@@ -32,53 +36,36 @@ export default class AskToReview extends Component {
   		this.props.navigate('Home')
   	}
 
-  	componentWillMount = () => {
-  		this.setState({lesson:this.props.lesson})
-  		// console.log(this.state.lesson)
-  	}
-
-	getDocIcon = () => {
-		// console.log(this.props.lesson.media)
-		switch(this.props.lesson.media.type) {
-		  	case 'none':
-		  		return (<Text style={{marginBottom: 20}}> None </Text>);
-		    	break;
-		    case undefined:
-		  		return (<Text style={{marginBottom: 20}}> None </Text>);
-		    	break;
-		    case 'image':
-		    	return (
-		    		<View style={{alignItems: 'center'}}> 
-			    		<Image
-					  		source={{uri: this.state.lesson.media.ref}}
-					  		style={styles.mediaPicture}
-						/>
-		    		</View>
-		    	);
-		    	break; 
-		    case 'video':
-		    	return (
-		    		<View style={{alignItems: 'center'}}>
-			    		<FontAwesome name={'play-circle'} size={ 75 } style={{color: 'black'}} />
-		    		</View>
-		    	);
-		    	break; 
-		    case 'music':
-		    	return (
-		    		<View style={{alignItems: 'center'}}>
-			    		<FontAwesome name={'music'} size={ 75 } style={{color: 'black'}} />
-		    		</View>
-		    		);
-		    	break; 
-		    case 'document':
-		    	return (
-		    		<View style={{alignItems: 'center'}}>
-			    		<FontAwesome name={'paperclip'} size={ 75 } style={{color: 'black'}} />
-		    		</View>
-		    		);
-		    	break; 
-		  	default:
-		    	return (<Text style={{marginBottom: 20}}> None </Text>);
+  	async componentWillMount() {
+		docs = await firestore.collection('lessons/'+this.props.lesson.lessonName+'/reviews').get();
+		let reviews = [];
+		docs.forEach((doc) => {
+			//console.log(doc.data())
+			reviews.push(doc.data())
+		});	
+		if(reviews !== undefined) {
+			console.log('here')
+			this.setState({ 
+				lesson: this.props.lesson,
+				reviews : reviews,
+				reviewsShow: true,
+				loading: false,
+			});
+		} else if(reviews.length !== 0) {
+			console.log('here2')
+			this.setState({ 
+				lesson: this.props.lesson,
+				reviews : reviews,
+				reviewsShow: true,
+				loading: false,
+			});
+		} else {
+			console.log('here3')
+			this.setState({ 
+				lesson: this.props.lesson,
+				reviews : reviews,
+				loading: false,
+			});
 		}
 	}
 
@@ -102,9 +89,9 @@ export default class AskToReview extends Component {
 		} else if(this.state.reviews.length === 0) {
 			return (<Text style={{marginBottom: 20}}> No reviews currently for this lesson. </Text>);
 		} else {
-			return this.state.reviews.map((review) => {
+			return this.state.reviews.map((review, index) => {
 				return (
-					<View>
+					<View key={index}>
 						<View style={styles.starRating} >
 							<StarRating
 						        disabled={false}
@@ -117,9 +104,10 @@ export default class AskToReview extends Component {
 						        fullStarColor={'darkviolet'}
 						    />
 					    </View>
-					    <Text > {review.like} </Text>
-					    <Text > {review.wish} </Text>
-					    <Text style={{marginBottom: 20}}> {review.wonder} </Text>
+					    <Text > I like: {review.like} </Text>
+					    <Text > I wish: {review.wish} </Text>
+					    <Text > I wonder: {review.wonder} </Text>
+					    <Text style={{marginBottom: 20}}> By: {review.reviewer.firstName} {review.reviewer.lastName}</Text>
 					</View>
 				);
 			});
@@ -147,10 +135,65 @@ export default class AskToReview extends Component {
 		      				<Text style={{marginBottom: 20}}> {this.props.lesson.instructions} </Text>
 		      				
 		      				<Text style={{fontWeight: 'bold'}}> Media </Text>
-							{this.getDocIcon()}
+							{
+							  	(this.props.lesson.media.type === 'none') ?
+							  			<Text style={{marginBottom: 20}}> None </Text>
+							  	:
+							    (this.props.lesson.media.type === 'undefined') ?
+							  		<Text style={{marginBottom: 20}}> None </Text>
+							  	:
+							    (this.props.lesson.media.type === 'image') ?
+					    			<Image
+								  		source={{uri: this.props.lesson.media.ref}}
+								  		style={styles.mediaPicture}
+									/>
+						    	:
+						    	(this.props.lesson.media.type === 'video') ?
+						    		<View style={{alignItems: 'center'}}>
+							    		<FontAwesome name={'play-circle'} size={ 75 } style={{color: 'black'}} />
+						    		</View>
+						    	:
+		    					(this.props.lesson.media.type === 'music') ?
+						    		<View style={{alignItems: 'center'}}>
+							    		<FontAwesome name={'music'} size={ 75 } style={{color: 'black'}} />
+						    		</View>
+ 								:
+							    (this.props.lesson.media.type === 'document') ?
+						    		<View style={{alignItems: 'center'}}>
+							    		<FontAwesome name={'paperclip'} size={ 75 } style={{color: 'black'}} />
+						    		</View>
+						    	:
+						    	null
+							}
 
 							<Text style={{fontWeight: 'bold'}}> Reviews </Text>
-							{this.returnLessonReviews()}
+							{	
+								this.state.reviewsShow ?
+									this.state.reviews.map((review, index) => {
+										return(
+											<View key={index}>
+												<View style={styles.starRating} >
+													<StarRating
+												        disabled={true}
+												        maxStars={5}
+												        emptyStar={'ios-star-outline'}
+												        fullStar={'ios-star'}
+												        halfStar={'ios-star-half'}
+												        iconSet={'Ionicons'}
+												        rating={review.rating}
+												        fullStarColor={'darkviolet'}
+												    />
+											    </View>
+											    <Text > I like: {review.like} </Text>
+											    <Text > I wish: {review.wish} </Text>
+											    <Text > I wonder: {review.wonder} </Text>
+											    <Text style={{marginBottom: 20}}> By: {review.reviewer.firstName} {review.reviewer.lastName}</Text>
+											</View>
+										)
+									})
+								:
+								<Text style={{marginBottom: 20}}> No reviews currently for this lesson. </Text>
+							}
 		      			</ScrollView>
 	      			</View>
 	      			<LinearGradient colors={[Colors.lg1, Colors.lg2, Colors.lg3]} style={styles.button} >

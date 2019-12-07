@@ -63,6 +63,7 @@ export default class TodaysLesson extends Component {
 			//console.log(doc.data())
 			reviews.push(doc.data())
 		});	
+
 		if(reviews !== undefined) {
 			console.log('here')
 			this.setState({ 
@@ -86,57 +87,6 @@ export default class TodaysLesson extends Component {
 				reviews : reviews,
 				loading: false,
 			});
-		}
-	}
-
-  	getDocIcon = () => {
-		console.log(this.props.lesson.media)
-		switch(this.props.lesson.media.type) {
-		  	case 'none':
-		  		return (<Text style={{marginBottom: 20}}> None </Text>);
-		    	break;
-		    case undefined:
-		  		return (<Text style={{marginBottom: 20}}> None </Text>);
-		    	break;
-		    case 'image':
-		    	return (
-		    		<View style={{alignItems: 'center'}}> 
-		    		{
-		    			this.state.loading ?
-		    			<ActivityIndicator size="large" color="#0000ff" />
-		    			:
-		    			<Image
-					  		source={{uri: this.props.lesson.media.ref}}
-					  		style={styles.mediaPicture}
-						/>
-		    		}
-			    		
-		    		</View>
-		    	);
-		    	break; 
-		    case 'video':
-		    	return (
-		    		<View style={{alignItems: 'center'}}>
-			    		<FontAwesome name={'play-circle'} size={ 75 } style={{color: 'black'}} />
-		    		</View>
-		    	);
-		    	break; 
-		    case 'music':
-		    	return (
-		    		<View style={{alignItems: 'center'}}>
-			    		<FontAwesome name={'music'} size={ 75 } style={{color: 'black'}} />
-		    		</View>
-		    		);
-		    	break; 
-		    case 'document':
-		    	return (
-		    		<View style={{alignItems: 'center'}}>
-			    		<FontAwesome name={'paperclip'} size={ 75 } style={{color: 'black'}} />
-		    		</View>
-		    		);
-		    	break; 
-		  	default:
-		    	return (<Text style={{marginBottom: 20}}> Error </Text>);
 		}
 	}
 
@@ -206,7 +156,7 @@ export default class TodaysLesson extends Component {
 											<View key={index}>
 												<View style={styles.starRating} >
 													<StarRating
-												        disabled={false}
+												        disabled={true}
 												        maxStars={5}
 												        emptyStar={'ios-star-outline'}
 												        fullStar={'ios-star'}

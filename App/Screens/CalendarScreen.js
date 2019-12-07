@@ -92,7 +92,7 @@ export default class CalendarScreen extends React.Component {
 		  		return (<ReviewFinishedLesson {...this.state} setComponent = {this.setComponent}  setScreenState = {this.setScreenState}/>);
 		    	break;
 		    case 'YourReview':
-		  		return (<YourReview {...this.state} setScreenState = {this.setScreenState}/>);
+		  		return (<YourReview {...this.state} setComponent = {this.setComponent} setScreenState = {this.setScreenState}/>);
 		    	break;	
 		    case 'ReviewSubmitted':
 		  		return (<ReviewSubmitted setComponent = {this.setComponent} navigate = {this.props.navigation.navigate} />);
